@@ -10,10 +10,10 @@
         var i, j, n, table, td, tr;
         table = $("<table border=1>");
         n = 0;
-        for (i = 0; i < 5; i++) {
+        for (i = 0; i < 5; i += 1) {
           tr = $("<tr>");
           table.append(tr);
-          for (j = 0; j < 5; j++) {
+          for (j = 0; j < 5; j += 1) {
             td = $("<td>x" + i + "," + j + "," + n + "</td>");
             td.attr("id", "pos" + n);
             n += 1;
@@ -25,10 +25,21 @@
       return self = {
         place_die: function(i, value) {
           return $("#pos" + i).html(value);
+        },
+        hover_square: function(f) {
+          return $("td").hover(function() {
+            var id, index;
+            id = $(this).attr("id");
+            index = id.match(/\d+/)[0];
+            return f(index);
+          });
         }
       };
     };
     b = board();
+    b.hover_square(function(index) {
+      return console.log("hovering", index);
+    });
     shake_dice_onto_board = function() {
       var dice, i, numbers, _i, _results, _results2;
       numbers = (function() {
@@ -38,7 +49,7 @@
       }).apply(this, arguments);
       dice = _.sortBy(numbers, Math.random);
       _results2 = [];
-      for (i = 0; (0 <= num_squares ? i < num_squares : i > num_squares); (0 <= num_squares ? i += 1 : i -= 1)) {
+      for (i = 0; (0 <= num_squares ? i < num_squares : i > num_squares); i += 1) {
         _results2.push(b.place_die(i, dice[i]));
       }
       return _results2;
