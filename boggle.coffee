@@ -2,18 +2,21 @@ boggle = ->
   size = 5
   num_squares = size * size
   board = ->
+    table_data = ->
+      _.map [0...5], (row) ->
+        _.map [0...5], (col) ->
+          n = row * size + col
+          $("<td>").attr("id", "pos#{n}")
+          
     do ->
       table = $("<table border=1>")
-      n = 0
-      for i in [0...5] by 1
+      for row in table_data()
         tr = $("<tr>")
-        table.append(tr)
-        for j in [0...5] by 1
-          td = $("<td>x#{i},#{j},#{n}</td>")
-          td.attr("id", "pos#{n}")
-          n += 1
+        for td in row
           tr.append(td)
+        table.append(tr)
       $("#board").append(table)
+
     self =
       square: (i) ->
         $("#pos#{i}")
@@ -40,7 +43,6 @@ boggle = ->
     return (Math.abs(r1-r2) <= 1) && (Math.abs(c1-c2) <= 1)
     
   touch_all_squares = (f, on_handler, off_handler) ->
-    console.log "in touch_all_squares"
     for square in [0...num_squares] by 1
       if f(square)
         on_handler(square)
