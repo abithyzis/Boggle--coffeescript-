@@ -15,15 +15,17 @@ boggle = ->
           tr.append(td)
       $("#board").append(table)
     self =
+      square: (i) ->
+        $("#pos#{i}")
       place_die: (i, value) ->
-        $("#pos#{i}").html(value)
+        self.square(i).html(value)
       hover_square: (f) ->
         $("td").hover ->
           id = $(this).attr("id")
           index = id.match(/\d+/)[0]
           f(index)
       highlight: (pos) ->
-        $("#pos#{pos}").css("background", "green")
+        self.square(pos).css("background", "green")
         
   b = board()
   b.hover_square (index) ->

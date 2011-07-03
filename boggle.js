@@ -23,8 +23,11 @@
         return $("#board").append(table);
       })();
       return self = {
+        square: function(i) {
+          return $("#pos" + i);
+        },
         place_die: function(i, value) {
-          return $("#pos" + i).html(value);
+          return self.square(i).html(value);
         },
         hover_square: function(f) {
           return $("td").hover(function() {
@@ -35,7 +38,7 @@
           });
         },
         highlight: function(pos) {
-          return $("#pos" + pos).css("background", "green");
+          return self.square(pos).css("background", "green");
         }
       };
     };
