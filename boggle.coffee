@@ -1,20 +1,26 @@
+util = ->
+  build_table_from_2d_cell_array: (array_2d) ->
+    table = $("<table border=1>")
+    for row in array_2d
+      tr = $("<tr>")
+      for td in row
+        tr.append(td)
+      table.append(tr)
+    table
+Util = util()
+
 boggle = ->
-  size = 5
+  size = 4
   num_squares = size * size
   board = ->
     table_data = ->
-      _.map [0...5], (row) ->
-        _.map [0...5], (col) ->
+      _.map [0...size], (row) ->
+        _.map [0...size], (col) ->
           n = row * size + col
           $("<td>").attr("id", "pos#{n}")
           
     do ->
-      table = $("<table border=1>")
-      for row in table_data()
-        tr = $("<tr>")
-        for td in row
-          tr.append(td)
-        table.append(tr)
+      table = Util.build_table_from_2d_cell_array(table_data())
       $("#board").append(table)
 
     self =

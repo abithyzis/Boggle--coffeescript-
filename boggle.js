@@ -1,26 +1,12 @@
 (function() {
-  var boggle;
-  boggle = function() {
-    var b, board, is_adjacent, num_squares, shake_dice_onto_board, size, touch_all_squares;
-    size = 5;
-    num_squares = size * size;
-    board = function() {
-      var self, table_data;
-      table_data = function() {
-        return _.map([0, 1, 2, 3, 4], function(row) {
-          return _.map([0, 1, 2, 3, 4], function(col) {
-            var n;
-            n = row * size + col;
-            return $("<td>").attr("id", "pos" + n);
-          });
-        });
-      };
-      (function() {
-        var row, table, td, tr, _i, _j, _len, _len2, _ref;
+  var Util, boggle, util;
+  util = function() {
+    return {
+      build_table_from_2d_cell_array: function(array_2d) {
+        var row, table, td, tr, _i, _j, _len, _len2;
         table = $("<table border=1>");
-        _ref = table_data();
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          row = _ref[_i];
+        for (_i = 0, _len = array_2d.length; _i < _len; _i++) {
+          row = array_2d[_i];
           tr = $("<tr>");
           for (_j = 0, _len2 = row.length; _j < _len2; _j++) {
             td = row[_j];
@@ -28,6 +14,39 @@
           }
           table.append(tr);
         }
+        return table;
+      }
+    };
+  };
+  Util = util();
+  boggle = function() {
+    var b, board, is_adjacent, num_squares, shake_dice_onto_board, size, touch_all_squares;
+    size = 4;
+    num_squares = size * size;
+    board = function() {
+      var self, table_data;
+      table_data = function() {
+        var _i, _results;
+        return _.map((function() {
+          _results = [];
+          for (var _i = 0; 0 <= size ? _i < size : _i > size; 0 <= size ? _i += 1 : _i -= 1){ _results.push(_i); }
+          return _results;
+        }).apply(this, arguments), function(row) {
+          var _i, _results;
+          return _.map((function() {
+            _results = [];
+            for (var _i = 0; 0 <= size ? _i < size : _i > size; 0 <= size ? _i += 1 : _i -= 1){ _results.push(_i); }
+            return _results;
+          }).apply(this, arguments), function(col) {
+            var n;
+            n = row * size + col;
+            return $("<td>").attr("id", "pos" + n);
+          });
+        });
+      };
+      (function() {
+        var table;
+        table = Util.build_table_from_2d_cell_array(table_data());
         return $("#board").append(table);
       })();
       return self = {
