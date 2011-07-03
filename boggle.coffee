@@ -16,7 +16,7 @@ boggle = ->
       _.map [0...size], (row) ->
         _.map [0...size], (col) ->
           n = row * size + col
-          $("<td>").attr("id", "pos#{n}")
+          $("<td>").attr("id", "pos#{n}").css("height", "30px").css("width", "30px")
           
     do ->
       table = Util.build_table_from_2d_cell_array(table_data())

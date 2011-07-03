@@ -37,7 +37,7 @@
           }).apply(this, arguments), function(col) {
             var n;
             n = row * size + col;
-            return $("<td>").attr("id", "pos" + n);
+            return $("<td>").attr("id", "pos" + n).css("height", "30px").css("width", "30px");
           });
         });
       };
