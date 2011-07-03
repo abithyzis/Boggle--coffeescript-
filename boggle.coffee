@@ -22,12 +22,10 @@ boggle = ->
         parseInt(id.match(/\d+/)[0])
       place_die: (i, value) ->
         self.square(i).html(value)
-      hover_square: (in_callback, out_callback) ->
-        in_handler = ->
-          in_callback(self.index(this))
-        out_handler = ->
-          out_callback(self.index(this))
-        $("td").hover(in_handler, out_handler)
+      on_click_square: (callback) ->
+        handler = ->
+          callback(self.index(this))
+        $("td").click handler
       highlight: (pos) ->
         self.square(pos).css("background", "green")
       lowlight: (pos) ->
@@ -41,19 +39,19 @@ boggle = ->
     c2 = s2 % size
     return (Math.abs(r1-r2) <= 1) && (Math.abs(c1-c2) <= 1)
     
-  adjacent_squares = (index) ->
-    _.select [0...num_squares], (i) ->
-      is_adjacent(i, index)
-
-  touch_squares = (squares, f) ->
-    for square in squares
-      f(square)
-  in_callback = (index) ->
-    touch_squares adjacent_squares(index), b.highlight
-  out_callback = (index) ->
-    touch_squares adjacent_squares(index), b.lowlight
+  touch_all_squares = (f, on_handler, off_handler) ->
+    console.log "in touch_all_squares"
+    for square in [0...num_squares] by 1
+      if f(square)
+        on_handler(square)
+      else
+        off_handler(square)
+      
   b = board()
-  b.hover_square(in_callback, out_callback)
+  b.on_click_square (square) ->
+    f = (i) ->
+      is_adjacent(i, square)
+    touch_all_squares(f, b.highlight, b.lowlight)
 
   shake_dice_onto_board = ->
     numbers = [0...num_squares]

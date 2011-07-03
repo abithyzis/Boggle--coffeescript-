@@ -1,7 +1,7 @@
 (function() {
   var boggle;
   boggle = function() {
-    var adjacent_squares, b, board, in_callback, is_adjacent, num_squares, out_callback, shake_dice_onto_board, size, touch_squares;
+    var b, board, is_adjacent, num_squares, shake_dice_onto_board, size, touch_all_squares;
     size = 5;
     num_squares = size * size;
     board = function() {
@@ -34,15 +34,12 @@
         place_die: function(i, value) {
           return self.square(i).html(value);
         },
-        hover_square: function(in_callback, out_callback) {
-          var in_handler, out_handler;
-          in_handler = function() {
-            return in_callback(self.index(this));
+        on_click_square: function(callback) {
+          var handler;
+          handler = function() {
+            return callback(self.index(this));
           };
-          out_handler = function() {
-            return out_callback(self.index(this));
-          };
-          return $("td").hover(in_handler, out_handler);
+          return $("td").click(handler);
         },
         highlight: function(pos) {
           return self.square(pos).css("background", "green");
@@ -63,33 +60,23 @@
       c2 = s2 % size;
       return (Math.abs(r1 - r2) <= 1) && (Math.abs(c1 - c2) <= 1);
     };
-    adjacent_squares = function(index) {
-      var _i, _results;
-      return _.select((function() {
-        _results = [];
-        for (var _i = 0; 0 <= num_squares ? _i < num_squares : _i > num_squares; 0 <= num_squares ? _i += 1 : _i -= 1){ _results.push(_i); }
-        return _results;
-      }).apply(this, arguments), function(i) {
-        return is_adjacent(i, index);
-      });
-    };
-    touch_squares = function(squares, f) {
-      var square, _i, _len, _results;
+    touch_all_squares = function(f, on_handler, off_handler) {
+      var square, _results;
+      console.log("in touch_all_squares");
       _results = [];
-      for (_i = 0, _len = squares.length; _i < _len; _i++) {
-        square = squares[_i];
-        _results.push(f(square));
+      for (square = 0; (0 <= num_squares ? square < num_squares : square > num_squares); square += 1) {
+        _results.push(f(square) ? on_handler(square) : off_handler(square));
       }
       return _results;
     };
-    in_callback = function(index) {
-      return touch_squares(adjacent_squares(index), b.highlight);
-    };
-    out_callback = function(index) {
-      return touch_squares(adjacent_squares(index), b.lowlight);
-    };
     b = board();
-    b.hover_square(in_callback, out_callback);
+    b.on_click_square(function(square) {
+      var f;
+      f = function(i) {
+        return is_adjacent(i, square);
+      };
+      return touch_all_squares(f, b.highlight, b.lowlight);
+    });
     shake_dice_onto_board = function() {
       var dice, i, numbers, _i, _results, _results2;
       numbers = (function() {
