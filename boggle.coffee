@@ -17,19 +17,24 @@ boggle = ->
     self =
       square: (i) ->
         $("#pos#{i}")
+      index: (element) ->
+        id = $(element).attr("id")
+        id.match(/\d+/)[0]
       place_die: (i, value) ->
         self.square(i).html(value)
-      hover_square: (f) ->
-        $("td").hover ->
-          id = $(this).attr("id")
-          index = id.match(/\d+/)[0]
-          f(index)
+      hover_square: (in_callback, out_callback) ->
+        in_handler = ->
+          in_callback(self.index(this))
+        out_handler = ->
+          out_callback(self.index(this))
+        $("td").hover(in_handler, out_handler)
       highlight: (pos) ->
         self.square(pos).css("background", "green")
-        
+      lowlight: (pos) ->
+        self.square(pos).css("background", "white")
+
   b = board()
-  b.hover_square (index) ->
-    b.highlight(index)
+  b.hover_square(b.highlight, b.lowlight)
 
   shake_dice_onto_board = ->
     numbers = [0...num_squares]

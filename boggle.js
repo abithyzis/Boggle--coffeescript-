@@ -26,26 +26,34 @@
         square: function(i) {
           return $("#pos" + i);
         },
+        index: function(element) {
+          var id;
+          id = $(element).attr("id");
+          return id.match(/\d+/)[0];
+        },
         place_die: function(i, value) {
           return self.square(i).html(value);
         },
-        hover_square: function(f) {
-          return $("td").hover(function() {
-            var id, index;
-            id = $(this).attr("id");
-            index = id.match(/\d+/)[0];
-            return f(index);
-          });
+        hover_square: function(in_callback, out_callback) {
+          var in_handler, out_handler;
+          in_handler = function() {
+            return in_callback(self.index(this));
+          };
+          out_handler = function() {
+            return out_callback(self.index(this));
+          };
+          return $("td").hover(in_handler, out_handler);
         },
         highlight: function(pos) {
           return self.square(pos).css("background", "green");
+        },
+        lowlight: function(pos) {
+          return self.square(pos).css("background", "white");
         }
       };
     };
     b = board();
-    b.hover_square(function(index) {
-      return b.highlight(index);
-    });
+    b.hover_square(b.highlight, b.lowlight);
     shake_dice_onto_board = function() {
       var dice, i, numbers, _i, _results, _results2;
       numbers = (function() {
