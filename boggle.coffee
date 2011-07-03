@@ -22,9 +22,12 @@ boggle = ->
           id = $(this).attr("id")
           index = id.match(/\d+/)[0]
           f(index)
+      highlight: (pos) ->
+        $("#pos#{pos}").css("background", "green")
+        
   b = board()
   b.hover_square (index) ->
-    console.log "hovering", index
+    b.highlight(index)
 
   shake_dice_onto_board = ->
     numbers = [0...num_squares]

@@ -33,12 +33,15 @@
             index = id.match(/\d+/)[0];
             return f(index);
           });
+        },
+        highlight: function(pos) {
+          return $("#pos" + pos).css("background", "green");
         }
       };
     };
     b = board();
     b.hover_square(function(index) {
-      return console.log("hovering", index);
+      return b.highlight(index);
     });
     shake_dice_onto_board = function() {
       var dice, i, numbers, _i, _results, _results2;
