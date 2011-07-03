@@ -1,7 +1,7 @@
 (function() {
   var boggle;
   boggle = function() {
-    var b, board, num_squares, shake_dice_onto_board, size;
+    var adjacent_squares, b, board, in_callback, is_adjacent, num_squares, out_callback, shake_dice_onto_board, size, touch_squares;
     size = 5;
     num_squares = size * size;
     board = function() {
@@ -29,7 +29,7 @@
         index: function(element) {
           var id;
           id = $(element).attr("id");
-          return id.match(/\d+/)[0];
+          return parseInt(id.match(/\d+/)[0]);
         },
         place_die: function(i, value) {
           return self.square(i).html(value);
@@ -52,8 +52,44 @@
         }
       };
     };
+    is_adjacent = function(s1, s2) {
+      var c1, c2, r1, r2;
+      if (s1 === s2) {
+        return false;
+      }
+      r1 = Math.floor(s1 / size);
+      c1 = s1 % size;
+      r2 = Math.floor(s2 / size);
+      c2 = s2 % size;
+      return (Math.abs(r1 - r2) <= 1) && (Math.abs(c1 - c2) <= 1);
+    };
+    adjacent_squares = function(index) {
+      var _i, _results;
+      return _.select((function() {
+        _results = [];
+        for (var _i = 0; 0 <= num_squares ? _i < num_squares : _i > num_squares; 0 <= num_squares ? _i += 1 : _i -= 1){ _results.push(_i); }
+        return _results;
+      }).apply(this, arguments), function(i) {
+        return is_adjacent(i, index);
+      });
+    };
+    touch_squares = function(squares, f) {
+      var square, _i, _len, _results;
+      _results = [];
+      for (_i = 0, _len = squares.length; _i < _len; _i++) {
+        square = squares[_i];
+        _results.push(f(square));
+      }
+      return _results;
+    };
+    in_callback = function(index) {
+      return touch_squares(adjacent_squares(index), b.highlight);
+    };
+    out_callback = function(index) {
+      return touch_squares(adjacent_squares(index), b.lowlight);
+    };
     b = board();
-    b.hover_square(b.highlight, b.lowlight);
+    b.hover_square(in_callback, out_callback);
     shake_dice_onto_board = function() {
       var dice, i, numbers, _i, _results, _results2;
       numbers = (function() {
