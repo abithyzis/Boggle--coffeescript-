@@ -1,24 +1,21 @@
 (function() {
-  var Util, boggle, util;
-  util = function() {
-    return {
-      build_table_from_2d_cell_array: function(array_2d) {
-        var row, table, td, tr, _i, _j, _len, _len2;
-        table = $("<table border=1>");
-        for (_i = 0, _len = array_2d.length; _i < _len; _i++) {
-          row = array_2d[_i];
-          tr = $("<tr>");
-          for (_j = 0, _len2 = row.length; _j < _len2; _j++) {
-            td = row[_j];
-            tr.append(td);
-          }
-          table.append(tr);
+  var Util, boggle;
+  Util = {
+    build_table_from_2d_cell_array: function(array_2d) {
+      var row, table, td, tr, _i, _j, _len, _len2;
+      table = $("<table border=1>");
+      for (_i = 0, _len = array_2d.length; _i < _len; _i++) {
+        row = array_2d[_i];
+        tr = $("<tr>");
+        for (_j = 0, _len2 = row.length; _j < _len2; _j++) {
+          td = row[_j];
+          tr.append(td);
         }
-        return table;
+        table.append(tr);
       }
-    };
+      return table;
+    }
   };
-  Util = util();
   boggle = function() {
     var b, board, is_adjacent, num_squares, shake_dice_onto_board, size, touch_all_squares;
     size = 4;

@@ -1,4 +1,4 @@
-util = ->
+Util =
   build_table_from_2d_cell_array: (array_2d) ->
     table = $("<table border=1>")
     for row in array_2d
@@ -7,7 +7,6 @@ util = ->
         tr.append(td)
       table.append(tr)
     table
-Util = util()
 
 boggle = ->
   size = 4
