@@ -17,7 +17,7 @@
     }
   };
   boggle = function() {
-    var b, board, entry, is_adjacent, num_squares, shake_dice_onto_board, size, touch_all_squares, word_entry;
+    var board, is_adjacent, num_squares, size, touch_all_squares, word_entry;
     size = 4;
     num_squares = size * size;
     board = function() {
@@ -68,18 +68,26 @@
           return $("td").click(handler);
         },
         highlight: function(pos) {
-          return self.square(pos).css("background", "green");
+          return self.square(pos).css("background", "white");
         },
         lowlight: function(pos) {
-          return self.square(pos).css("background", "white");
+          return self.square(pos).css("background", "red");
         }
       };
     };
-    word_entry = function(board) {
-      var field;
-      field = $("<pre>");
-      $("#boggle").append(field);
-      field.html("ENTER WORD");
+    word_entry = function(b) {
+      var field, field_builder, word_builder;
+      word_builder = function() {
+        var square_index;
+        return square_index = [];
+      };
+      field_builder = function() {
+        var field;
+        field = $("<pre>");
+        $("#boggle").append(field);
+        return field;
+      };
+      field = field_builder();
       return b.on_click_square(function(i, square) {
         var f;
         f = function(j) {
@@ -108,23 +116,26 @@
       }
       return _results;
     };
-    b = board();
-    entry = word_entry(b);
-    shake_dice_onto_board = function() {
-      var dice, i, numbers, _i, _results, _results2;
-      numbers = (function() {
-        _results = [];
-        for (var _i = 0; 0 <= num_squares ? _i < num_squares : _i > num_squares; 0 <= num_squares ? _i += 1 : _i -= 1){ _results.push(_i); }
-        return _results;
-      }).apply(this, arguments);
-      dice = _.sortBy(numbers, Math.random);
-      _results2 = [];
-      for (i = 0; (0 <= num_squares ? i < num_squares : i > num_squares); i += 1) {
-        _results2.push(b.place_die(i, dice[i]));
-      }
-      return _results2;
-    };
-    return shake_dice_onto_board();
+    return (function() {
+      var b, entry, shake_dice_onto_board;
+      b = board();
+      entry = word_entry(b);
+      shake_dice_onto_board = function() {
+        var dice, i, numbers, _i, _results, _results2;
+        numbers = (function() {
+          _results = [];
+          for (var _i = 0; 0 <= num_squares ? _i < num_squares : _i > num_squares; 0 <= num_squares ? _i += 1 : _i -= 1){ _results.push(_i); }
+          return _results;
+        }).apply(this, arguments);
+        dice = _.sortBy(numbers, Math.random);
+        _results2 = [];
+        for (i = 0; (0 <= num_squares ? i < num_squares : i > num_squares); i += 1) {
+          _results2.push(b.place_die(i, dice[i]));
+        }
+        return _results2;
+      };
+      return shake_dice_onto_board();
+    })();
   };
   jQuery(document).ready(function() {
     return boggle();

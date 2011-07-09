@@ -36,14 +36,19 @@ boggle = ->
           callback(i, $(this))
         $("td").click handler
       highlight: (pos) ->
-        self.square(pos).css("background", "green")
-      lowlight: (pos) ->
         self.square(pos).css("background", "white")
+      lowlight: (pos) ->
+        self.square(pos).css("background", "red")
 
-  word_entry = (board) ->
-    field = $("<pre>")
-    $("#boggle").append(field)
-    field.html("ENTER WORD")
+  word_entry = (b) ->
+    word_builder = ->
+      square_index = []
+    field_builder = ->
+      field = $("<pre>")
+      $("#boggle").append(field)
+      field
+
+    field = field_builder()
     b.on_click_square (i, square) ->
       f = (j) ->
         is_adjacent(i, j)
@@ -64,16 +69,17 @@ boggle = ->
         on_handler(square)
       else
         off_handler(square)
-      
-  b = board()
-  entry = word_entry(b)
 
-  shake_dice_onto_board = ->
-    numbers = [0...num_squares]
-    dice = _.sortBy(numbers, Math.random)
-    for i in [0...num_squares] by 1
-      b.place_die(i, dice[i])
-  shake_dice_onto_board()
+  do ->
+    b = board()
+    entry = word_entry(b)
+
+    shake_dice_onto_board = ->
+      numbers = [0...num_squares]
+      dice = _.sortBy(numbers, Math.random)
+      for i in [0...num_squares] by 1
+        b.place_die(i, dice[i])
+    shake_dice_onto_board()
   
 jQuery(document).ready ->
   boggle()
