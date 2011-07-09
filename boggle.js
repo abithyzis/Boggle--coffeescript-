@@ -170,7 +170,7 @@
         if (self.in_reach(i)) {
           return "white";
         }
-        return "red";
+        return "#DDD";
       }
     };
   };
