@@ -92,7 +92,7 @@
     };
   };
   Display = function(size) {
-    var self;
+    var self, word_entry_span;
     (function() {
       var table, table_data;
       table_data = function() {
@@ -117,6 +117,8 @@
       table = Util.build_table_from_2d_cell_array(table_data());
       return $("#boggle").append(table);
     })();
+    word_entry_span = $("<span>");
+    $("#boggle").append(word_entry_span);
     return self = {
       square: function(i) {
         return $("#pos" + i);
@@ -140,14 +142,13 @@
         return self.square(pos).css("background", color);
       },
       word_entry: function() {
-        var back_button, field, self, span;
-        span = $("<span>");
-        $("#boggle").append(span);
+        var back_button, field, self;
+        word_entry_span.html('');
         field = $("<pre>");
-        span.append(field);
+        word_entry_span.append(field);
         back_button = $("<input type='button'>");
         back_button.attr("value", "BACK");
-        span.append(back_button);
+        word_entry_span.append(back_button);
         back_button.hide();
         return self = {
           field: {

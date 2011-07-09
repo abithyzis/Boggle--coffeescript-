@@ -54,6 +54,9 @@ Display = (size) ->
     table = Util.build_table_from_2d_cell_array(table_data())
     $("#boggle").append(table)
 
+  word_entry_span = $("<span>")
+  $("#boggle").append(word_entry_span)
+
   self =
     square: (i) ->
       $("#pos#{i}")
@@ -69,13 +72,12 @@ Display = (size) ->
     color: (pos, color) ->
       self.square(pos).css("background", color)
     word_entry: ->
-      span = $("<span>")
-      $("#boggle").append(span)
+      word_entry_span.html('')
       field = $("<pre>")
-      span.append(field)
+      word_entry_span.append(field)
       back_button = $("<input type='button'>")
       back_button.attr("value", "BACK")
-      span.append(back_button)
+      word_entry_span.append(back_button)
       back_button.hide()
       self =
         field:
