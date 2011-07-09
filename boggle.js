@@ -30,7 +30,7 @@
     dice = [];
     num_squares = size * size;
     shake_dice_onto_board = function() {
-      var i, numbers, _i, _results, _results2;
+      var die, i, numbers, _i, _len, _results, _results2;
       numbers = (function() {
         _results = [];
         for (var _i = 0; 0 <= num_squares ? _i < num_squares : _i > num_squares; 0 <= num_squares ? _i += 1 : _i -= 1){ _results.push(_i); }
@@ -38,8 +38,9 @@
       }).apply(this, arguments);
       dice = Util.shuffle_array(numbers);
       _results2 = [];
-      for (i = 0; (0 <= num_squares ? i < num_squares : i > num_squares); i += 1) {
-        _results2.push(display.place_die(i, dice[i]));
+      for (i = 0, _len = dice.length; i < _len; i++) {
+        die = dice[i];
+        _results2.push(display.place_die(i, die));
       }
       return _results2;
     };

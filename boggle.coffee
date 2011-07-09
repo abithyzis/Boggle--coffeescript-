@@ -16,8 +16,8 @@ Board = (display, size) ->
   shake_dice_onto_board = ->
     numbers = [0...num_squares]
     dice = Util.shuffle_array(numbers)
-    for i in [0...num_squares] by 1
-      display.place_die(i, dice[i])
+    for die, i in dice
+      display.place_die(i, die)
   shake_dice_onto_board()
   self =
     get_letter: (i) -> dice[i]
