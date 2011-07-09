@@ -1,5 +1,11 @@
 (function() {
   var Util, boggle;
+  var __indexOf = Array.prototype.indexOf || function(item) {
+    for (var i = 0, l = this.length; i < l; i++) {
+      if (this[i] === item) return i;
+    }
+    return -1;
+  };
   Util = {
     build_table_from_2d_cell_array: function(array_2d) {
       var row, table, td, tr, _i, _j, _len, _len2;
@@ -84,13 +90,16 @@
           add: function(i) {
             return square_indexes.push(i);
           },
-          legal: function(j) {
+          already_used: function(i) {
+            return __indexOf.call(square_indexes, i) >= 0;
+          },
+          legal: function(new_i) {
             var i;
             if (square_indexes.length === 0) {
               return true;
             }
             i = square_indexes[square_indexes.length - 1];
-            return is_adjacent(i, j);
+            return is_adjacent(i, new_i) && !self.already_used(new_i);
           }
         };
       };
