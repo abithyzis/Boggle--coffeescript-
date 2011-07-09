@@ -42,18 +42,29 @@ boggle = ->
 
   word_entry = (b) ->
     word_builder = ->
-      square_index = []
+      square_indexes = []
+      self =
+        add: (i) ->
+          square_indexes.push(i)
+        legal: (j) ->
+          return true if square_indexes.length == 0
+          i = square_indexes[square_indexes.length - 1]
+          is_adjacent(i, j)
+          
     field_builder = ->
       field = $("<pre>")
       $("#boggle").append(field)
       field
 
+    word = word_builder()
     field = field_builder()
     b.on_click_square (i, square) ->
-      f = (j) ->
-        is_adjacent(i, j)
-      touch_all_squares(f, b.highlight, b.lowlight)
-      field.append(square.html())
+      if !word.legal(i)
+        alert "illegal square choice" 
+        return
+      word.add(i)
+      touch_all_squares(word.legal, b.highlight, b.lowlight)
+      field.append("_" + square.html())
           
   is_adjacent = (s1, s2) ->
     return false if s1 == s2

@@ -76,10 +76,23 @@
       };
     };
     word_entry = function(b) {
-      var field, field_builder, word_builder;
+      var field, field_builder, word, word_builder;
       word_builder = function() {
-        var square_index;
-        return square_index = [];
+        var self, square_indexes;
+        square_indexes = [];
+        return self = {
+          add: function(i) {
+            return square_indexes.push(i);
+          },
+          legal: function(j) {
+            var i;
+            if (square_indexes.length === 0) {
+              return true;
+            }
+            i = square_indexes[square_indexes.length - 1];
+            return is_adjacent(i, j);
+          }
+        };
       };
       field_builder = function() {
         var field;
@@ -87,14 +100,16 @@
         $("#boggle").append(field);
         return field;
       };
+      word = word_builder();
       field = field_builder();
       return b.on_click_square(function(i, square) {
-        var f;
-        f = function(j) {
-          return is_adjacent(i, j);
-        };
-        touch_all_squares(f, b.highlight, b.lowlight);
-        return field.append(square.html());
+        if (!word.legal(i)) {
+          alert("illegal square choice");
+          return;
+        }
+        word.add(i);
+        touch_all_squares(word.legal, b.highlight, b.lowlight);
+        return field.append("_" + square.html());
       });
     };
     is_adjacent = function(s1, s2) {
