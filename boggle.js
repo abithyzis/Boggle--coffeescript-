@@ -52,6 +52,17 @@
           _results.push(f(square));
         }
         return _results;
+      },
+      is_adjacent: function(s1, s2) {
+        var c1, c2, r1, r2;
+        if (s1 === s2) {
+          return false;
+        }
+        r1 = Math.floor(s1 / size);
+        c1 = s1 % size;
+        r2 = Math.floor(s2 / size);
+        c2 = s2 % size;
+        return (Math.abs(r1 - r2) <= 1) && (Math.abs(c1 - c2) <= 1);
       }
     };
   };
@@ -105,7 +116,7 @@
       }
     };
   };
-  Word_builder = function(is_adjacent) {
+  Word_builder = function(board) {
     var self, square_indexes;
     square_indexes = [];
     return self = {
@@ -121,7 +132,7 @@
           return true;
         }
         last_square = self.last_square_selected();
-        return is_adjacent(last_square, new_i);
+        return board.is_adjacent(last_square, new_i);
       },
       legal: function(new_i) {
         return self.in_reach(new_i) && !self.already_used(new_i);
@@ -147,9 +158,9 @@
     };
   };
   boggle = function() {
-    var is_adjacent, size, word_entry;
+    var size, word_entry;
     size = 4;
-    word_entry = function(board, display, is_adjacent) {
+    word_entry = function(board, display) {
       var color_all_squares, field, field_builder, word;
       field_builder = function() {
         var field;
@@ -162,7 +173,7 @@
           return display.color(i, word.color(i));
         });
       };
-      word = Word_builder(is_adjacent);
+      word = Word_builder(board);
       field = field_builder();
       return display.on_click_square(function(i) {
         if (!word.legal(i)) {
@@ -174,22 +185,11 @@
         return field.append("_" + board.get_letter(i));
       });
     };
-    is_adjacent = function(s1, s2) {
-      var c1, c2, r1, r2;
-      if (s1 === s2) {
-        return false;
-      }
-      r1 = Math.floor(s1 / size);
-      c1 = s1 % size;
-      r2 = Math.floor(s2 / size);
-      c2 = s2 % size;
-      return (Math.abs(r1 - r2) <= 1) && (Math.abs(c1 - c2) <= 1);
-    };
     return (function() {
       var board, display, entry;
       display = Display(size);
       board = Board(display, size);
-      return entry = word_entry(board, display, is_adjacent);
+      return entry = word_entry(board, display);
     })();
   };
   jQuery(document).ready(function() {

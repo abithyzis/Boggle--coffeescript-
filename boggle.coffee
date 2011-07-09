@@ -22,6 +22,13 @@ Board = (display, size) ->
     for_all_squares: (f) ->
       for square in [0...num_squares] by 1
         f(square)
+    is_adjacent: (s1, s2) ->
+      return false if s1 == s2
+      r1 = Math.floor(s1 / size)
+      c1 = s1 % size
+      r2 = Math.floor(s2 / size)
+      c2 = s2 % size
+      return (Math.abs(r1-r2) <= 1) && (Math.abs(c1-c2) <= 1)
 
 Display = (size) ->
   do ->
@@ -49,7 +56,7 @@ Display = (size) ->
     color: (pos, color) ->
       self.square(pos).css("background", color)
 
-Word_builder = (is_adjacent) ->
+Word_builder = (board) ->
   square_indexes = []
   self =
     add: (i) ->
@@ -59,7 +66,7 @@ Word_builder = (is_adjacent) ->
     in_reach: (new_i) ->
       return true if square_indexes.length == 0
       last_square = self.last_square_selected()
-      is_adjacent(last_square, new_i) 
+      board.is_adjacent(last_square, new_i) 
     legal: (new_i) ->
       self.in_reach(new_i) && !self.already_used(new_i)
     last_square_selected: () ->
@@ -74,7 +81,7 @@ Word_builder = (is_adjacent) ->
 boggle = ->
   size = 4
 
-  word_entry = (board, display, is_adjacent) ->
+  word_entry = (board, display) ->
     field_builder = ->
       field = $("<pre>")
       $("#boggle").append(field)
@@ -84,7 +91,7 @@ boggle = ->
       board.for_all_squares (i) ->
         display.color(i, word.color(i))
 
-    word = Word_builder(is_adjacent)
+    word = Word_builder(board)
     field = field_builder()
     display.on_click_square (i) ->
       if !word.legal(i)
@@ -93,19 +100,11 @@ boggle = ->
       word.add(i)
       color_all_squares()
       field.append("_" + board.get_letter(i))
-          
-  is_adjacent = (s1, s2) ->
-    return false if s1 == s2
-    r1 = Math.floor(s1 / size)
-    c1 = s1 % size
-    r2 = Math.floor(s2 / size)
-    c2 = s2 % size
-    return (Math.abs(r1-r2) <= 1) && (Math.abs(c1-c2) <= 1)
-    
+              
   do ->
     display = Display(size)
     board = Board(display, size)
-    entry = word_entry(board, display, is_adjacent)
+    entry = word_entry(board, display)
 
 jQuery(document).ready ->
   boggle()
