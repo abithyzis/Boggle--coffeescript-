@@ -131,25 +131,31 @@
       color: function(pos, color) {
         return self.square(pos).css("background", color);
       },
-      word_entry_field: function() {
-        var field;
-        field = $("<pre>");
-        $("#boggle").append(field);
-        return field;
+      word_entry: {
+        field: function() {
+          var field, self;
+          field = $("<pre>");
+          $("#boggle").append(field);
+          return self = {
+            set: function(text) {
+              return field.html(text);
+            }
+          };
+        }
       }
     };
   };
   Word_builder = function(board) {
-    var s, self, square_indexes;
+    var self, square_indexes;
     square_indexes = [];
-    s = '';
     return self = {
       add: function(i) {
-        square_indexes.push(i);
-        return s += board.get_letter(i);
+        return square_indexes.push(i);
       },
       text: function() {
-        return s;
+        return _.map(square_indexes, function(i) {
+          return board.get_letter(i);
+        }).join('');
       },
       already_used: function(i) {
         return __indexOf.call(square_indexes, i) >= 0;
@@ -193,7 +199,7 @@
       });
     };
     word = Word_builder(board);
-    field = display.word_entry_field();
+    field = display.word_entry.field();
     return display.on_click_square(function(i) {
       if (!word.legal(i)) {
         alert("illegal square choice");
@@ -201,7 +207,7 @@
       }
       word.add(i);
       color_all_squares();
-      return field.html(word.text());
+      return field.set(word.text());
     });
   };
   LetterDice = ["AAEEGN", "ELRTTY", "AOOTTW", "ABBJOO", "EHRTVW", "CIMOTU", "DISTTY", "EIOSST", "DELRVY", "ACHOPS", "HIMNQU", "EEINSU", "EEGHNW", "AFFKPS", "HLNNRZ", "DEILRX"];

@@ -64,22 +64,22 @@ Display = (size) ->
       $("td").click handler
     color: (pos, color) ->
       self.square(pos).css("background", color)
-    word_entry_field: ->
-      field = $("<pre>")
-      $("#boggle").append(field)
-      field
-
-      
+    word_entry:
+      field: ->
+        field = $("<pre>")
+        $("#boggle").append(field)
+        self =
+          set: (text) -> field.html(text)
 
 Word_builder = (board) ->
   square_indexes = []
-  s = ''
   self =
     add: (i) ->
       square_indexes.push(i)
-      s += board.get_letter(i)
     text: ->
-      s
+      _.map(square_indexes, (i) ->
+        board.get_letter(i)
+      ).join('')
     already_used: (i) ->
       i in square_indexes
     in_reach: (new_i) ->
@@ -103,14 +103,14 @@ Word_entry = (board, display) ->
       display.color(i, word.color(i))
 
   word = Word_builder(board)
-  field = display.word_entry_field()
+  field = display.word_entry.field()
   display.on_click_square (i) ->
     if !word.legal(i)
       alert "illegal square choice" 
       return
     word.add(i)
     color_all_squares()
-    field.html(word.text())
+    field.set(word.text())
 
 LetterDice =
   [
