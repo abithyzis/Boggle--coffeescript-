@@ -148,13 +148,24 @@
         back_button = $("<input type='button'>");
         back_button.attr("value", "BACK");
         span.append(back_button);
+        back_button.hide();
         return self = {
           field: {
             set: function(text) {
               return field.html(text);
             }
           },
-          back_button: back_button
+          back_button: {
+            hide: function() {
+              return back_button.hide();
+            },
+            show: function() {
+              return back_button.show();
+            },
+            on_click: function(f) {
+              return back_button.click(f);
+            }
+          }
         };
       }
     };
@@ -165,6 +176,9 @@
     return self = {
       add: function(i) {
         return square_indexes.push(i);
+      },
+      backspace: function() {
+        return square_indexes.pop();
       },
       text: function() {
         return _.map(square_indexes, function(i) {
@@ -206,23 +220,39 @@
     };
   };
   Word_entry = function(board, display) {
-    var back_button, color_all_squares, field, word, _ref;
+    var back_button, backspace, color_all_squares, field, on_click_letter, redraw, word, _ref;
     color_all_squares = function() {
       return board.for_all_squares(function(i) {
         return display.color(i, word.color(i));
       });
     };
-    word = Word_builder(board);
-    _ref = display.word_entry(), field = _ref.field, back_button = _ref.back_button;
-    return display.on_click_square(function(i) {
+    redraw = function() {
+      var text;
+      color_all_squares();
+      text = word.text();
+      field.set(text);
+      if (text.length > 0) {
+        return back_button.show();
+      } else {
+        return back_button.hide();
+      }
+    };
+    on_click_letter = function(i) {
       if (!word.legal(i)) {
         alert("illegal square choice");
         return;
       }
       word.add(i);
-      color_all_squares();
-      return field.set(word.text());
-    });
+      return redraw();
+    };
+    backspace = function() {
+      word.backspace();
+      return redraw();
+    };
+    word = Word_builder(board);
+    _ref = display.word_entry(), field = _ref.field, back_button = _ref.back_button;
+    display.on_click_square(on_click_letter);
+    return back_button.on_click(backspace);
   };
   LetterDice = ["AAEEGN", "ELRTTY", "AOOTTW", "ABBJOO", "EHRTVW", "CIMOTU", "DISTTY", "EIOSST", "DELRVY", "ACHOPS", "HIMNQU", "EEINSU", "EEGHNW", "AFFKPS", "HLNNRZ", "DEILRX"];
   boggle = function() {

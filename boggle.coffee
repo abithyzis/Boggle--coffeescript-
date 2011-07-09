@@ -76,17 +76,22 @@ Display = (size) ->
       back_button = $("<input type='button'>")
       back_button.attr("value", "BACK")
       span.append(back_button)
+      back_button.hide()
       self =
         field:
           set: (text) -> field.html(text)
         back_button:
-          back_button
+          hide: -> back_button.hide()
+          show: -> back_button.show()
+          on_click: (f) -> back_button.click(f)
         
 Word_builder = (board) ->
   square_indexes = []
   self =
     add: (i) ->
       square_indexes.push(i)
+    backspace: ->
+      square_indexes.pop()
     text: ->
       _.map(square_indexes, (i) ->
         board.get_letter(i)
@@ -113,15 +118,31 @@ Word_entry = (board, display) ->
     board.for_all_squares (i) ->
       display.color(i, word.color(i))
 
-  word = Word_builder(board)
-  {field, back_button} = display.word_entry()
-  display.on_click_square (i) ->
+  redraw = ->
+    color_all_squares()
+    text = word.text()
+    field.set(text)
+    if text.length > 0
+     back_button.show()
+    else
+      back_button.hide()
+  
+  on_click_letter = (i) ->
     if !word.legal(i)
       alert "illegal square choice" 
       return
     word.add(i)
-    color_all_squares()
-    field.set(word.text())
+    redraw()
+
+  backspace = ->
+    word.backspace()
+    redraw()
+
+  word = Word_builder(board)
+  {field, back_button} = display.word_entry()
+
+  display.on_click_square on_click_letter
+  back_button.on_click backspace
 
 LetterDice =
   [
