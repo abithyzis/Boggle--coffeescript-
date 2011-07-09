@@ -50,10 +50,12 @@ boggle = ->
           square_indexes.push(i)
         already_used: (i) ->
           i in square_indexes
-        legal: (new_i) ->
+        in_reach: (new_i) ->
           return true if square_indexes.length == 0
           i = square_indexes[square_indexes.length - 1]
-          is_adjacent(i, new_i) && !self.already_used(new_i)
+          is_adjacent(i, new_i) 
+        legal: (new_i) ->
+          self.in_reach(new_i) && !self.already_used(new_i)
           
     field_builder = ->
       field = $("<pre>")

@@ -93,13 +93,16 @@
           already_used: function(i) {
             return __indexOf.call(square_indexes, i) >= 0;
           },
-          legal: function(new_i) {
+          in_reach: function(new_i) {
             var i;
             if (square_indexes.length === 0) {
               return true;
             }
             i = square_indexes[square_indexes.length - 1];
-            return is_adjacent(i, new_i) && !self.already_used(new_i);
+            return is_adjacent(i, new_i);
+          },
+          legal: function(new_i) {
+            return self.in_reach(new_i) && !self.already_used(new_i);
           }
         };
       };
