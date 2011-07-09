@@ -69,16 +69,13 @@
         };
         return $("td").click(handler);
       },
-      highlight: function(pos) {
-        return self.square(pos).css("background", "white");
-      },
-      lowlight: function(pos) {
-        return self.square(pos).css("background", "red");
+      color: function(pos, color) {
+        return self.square(pos).css("background", color);
       }
     };
   };
   boggle = function() {
-    var is_adjacent, num_squares, size, touch_all_squares, word_entry;
+    var for_all_squares, is_adjacent, num_squares, size, word_entry;
     size = 4;
     num_squares = size * size;
     word_entry = function(display) {
@@ -103,6 +100,15 @@
           },
           legal: function(new_i) {
             return self.in_reach(new_i) && !self.already_used(new_i);
+          },
+          color: function(i) {
+            if (self.already_used(i)) {
+              return "lightblue";
+            }
+            if (self.in_reach(i)) {
+              return "white";
+            }
+            return "red";
           }
         };
       };
@@ -120,7 +126,9 @@
           return;
         }
         word.add(i);
-        touch_all_squares(word.legal, display.highlight, display.lowlight);
+        for_all_squares(function(i) {
+          return display.color(i, word.color(i));
+        });
         return field.append("_" + square.html());
       });
     };
@@ -135,11 +143,11 @@
       c2 = s2 % size;
       return (Math.abs(r1 - r2) <= 1) && (Math.abs(c1 - c2) <= 1);
     };
-    touch_all_squares = function(f, on_handler, off_handler) {
+    for_all_squares = function(f) {
       var square, _results;
       _results = [];
       for (square = 0; (0 <= num_squares ? square < num_squares : square > num_squares); square += 1) {
-        _results.push(f(square) ? on_handler(square) : off_handler(square));
+        _results.push(f(square));
       }
       return _results;
     };

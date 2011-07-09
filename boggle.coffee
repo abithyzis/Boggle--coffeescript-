@@ -32,11 +32,8 @@ Display = (size) ->
         i = self.index(this)
         callback(i, $(this))
       $("td").click handler
-    highlight: (pos) ->
-      self.square(pos).css("background", "white")
-    lowlight: (pos) ->
-      self.square(pos).css("background", "red")
-
+    color: (pos, color) ->
+      self.square(pos).css("background", color)
 
 boggle = ->
   size = 4
@@ -56,6 +53,10 @@ boggle = ->
           is_adjacent(i, new_i) 
         legal: (new_i) ->
           self.in_reach(new_i) && !self.already_used(new_i)
+        color: (i) ->
+          return "lightblue" if self.already_used(i)
+          return "white" if self.in_reach(i)
+          return "red"
           
     field_builder = ->
       field = $("<pre>")
@@ -69,7 +70,8 @@ boggle = ->
         alert "illegal square choice" 
         return
       word.add(i)
-      touch_all_squares(word.legal, display.highlight, display.lowlight)
+      for_all_squares (i) ->
+        display.color(i, word.color(i))
       field.append("_" + square.html())
           
   is_adjacent = (s1, s2) ->
@@ -80,12 +82,9 @@ boggle = ->
     c2 = s2 % size
     return (Math.abs(r1-r2) <= 1) && (Math.abs(c1-c2) <= 1)
     
-  touch_all_squares = (f, on_handler, off_handler) ->
+  for_all_squares = (f) ->
     for square in [0...num_squares] by 1
-      if f(square)
-        on_handler(square)
-      else
-        off_handler(square)
+      f(square)
 
   do ->
     display = Display(size)
