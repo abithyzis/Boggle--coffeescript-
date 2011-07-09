@@ -1,5 +1,5 @@
 (function() {
-  var Util, boggle;
+  var Display, Util, boggle;
   var __indexOf = Array.prototype.indexOf || function(item) {
     for (var i = 0, l = this.length; i < l; i++) {
       if (this[i] === item) return i;
@@ -22,66 +22,66 @@
       return table;
     }
   };
-  boggle = function() {
-    var board, is_adjacent, num_squares, size, touch_all_squares, word_entry;
-    size = 4;
-    num_squares = size * size;
-    board = function() {
-      var self, table_data;
-      table_data = function() {
+  Display = function(size) {
+    var self, table_data;
+    table_data = function() {
+      var _i, _results;
+      return _.map((function() {
+        _results = [];
+        for (var _i = 0; 0 <= size ? _i < size : _i > size; 0 <= size ? _i += 1 : _i -= 1){ _results.push(_i); }
+        return _results;
+      }).apply(this, arguments), function(row) {
         var _i, _results;
         return _.map((function() {
           _results = [];
           for (var _i = 0; 0 <= size ? _i < size : _i > size; 0 <= size ? _i += 1 : _i -= 1){ _results.push(_i); }
           return _results;
-        }).apply(this, arguments), function(row) {
-          var _i, _results;
-          return _.map((function() {
-            _results = [];
-            for (var _i = 0; 0 <= size ? _i < size : _i > size; 0 <= size ? _i += 1 : _i -= 1){ _results.push(_i); }
-            return _results;
-          }).apply(this, arguments), function(col) {
-            var n;
-            n = row * size + col;
-            return $("<td>").attr("id", "pos" + n).css("height", "30px").css("width", "30px");
-          });
+        }).apply(this, arguments), function(col) {
+          var n;
+          n = row * size + col;
+          return $("<td>").attr("id", "pos" + n).css("height", "30px").css("width", "30px");
         });
-      };
-      (function() {
-        var table;
-        table = Util.build_table_from_2d_cell_array(table_data());
-        return $("#boggle").append(table);
-      })();
-      return self = {
-        square: function(i) {
-          return $("#pos" + i);
-        },
-        index: function(element) {
-          var id;
-          id = $(element).attr("id");
-          return parseInt(id.match(/\d+/)[0]);
-        },
-        place_die: function(i, value) {
-          return self.square(i).html(value);
-        },
-        on_click_square: function(callback) {
-          var handler;
-          handler = function() {
-            var i;
-            i = self.index(this);
-            return callback(i, $(this));
-          };
-          return $("td").click(handler);
-        },
-        highlight: function(pos) {
-          return self.square(pos).css("background", "white");
-        },
-        lowlight: function(pos) {
-          return self.square(pos).css("background", "red");
-        }
-      };
+      });
     };
-    word_entry = function(b) {
+    (function() {
+      var table;
+      table = Util.build_table_from_2d_cell_array(table_data());
+      return $("#boggle").append(table);
+    })();
+    return self = {
+      square: function(i) {
+        return $("#pos" + i);
+      },
+      index: function(element) {
+        var id;
+        id = $(element).attr("id");
+        return parseInt(id.match(/\d+/)[0]);
+      },
+      place_die: function(i, value) {
+        return self.square(i).html(value);
+      },
+      on_click_square: function(callback) {
+        var handler;
+        handler = function() {
+          var i;
+          i = self.index(this);
+          return callback(i, $(this));
+        };
+        return $("td").click(handler);
+      },
+      highlight: function(pos) {
+        return self.square(pos).css("background", "white");
+      },
+      lowlight: function(pos) {
+        return self.square(pos).css("background", "red");
+      }
+    };
+  };
+  boggle = function() {
+    var is_adjacent, num_squares, size, touch_all_squares, word_entry;
+    size = 4;
+    num_squares = size * size;
+    word_entry = function(display) {
       var field, field_builder, word, word_builder;
       word_builder = function() {
         var self, square_indexes;
@@ -111,13 +111,13 @@
       };
       word = word_builder();
       field = field_builder();
-      return b.on_click_square(function(i, square) {
+      return display.on_click_square(function(i, square) {
         if (!word.legal(i)) {
           alert("illegal square choice");
           return;
         }
         word.add(i);
-        touch_all_squares(word.legal, b.highlight, b.lowlight);
+        touch_all_squares(word.legal, display.highlight, display.lowlight);
         return field.append("_" + square.html());
       });
     };
@@ -141,9 +141,9 @@
       return _results;
     };
     return (function() {
-      var b, entry, shake_dice_onto_board;
-      b = board();
-      entry = word_entry(b);
+      var display, entry, shake_dice_onto_board;
+      display = Display(size);
+      entry = word_entry(display);
       shake_dice_onto_board = function() {
         var dice, i, numbers, _i, _results, _results2;
         numbers = (function() {
@@ -154,7 +154,7 @@
         dice = _.sortBy(numbers, Math.random);
         _results2 = [];
         for (i = 0; (0 <= num_squares ? i < num_squares : i > num_squares); i += 1) {
-          _results2.push(b.place_die(i, dice[i]));
+          _results2.push(display.place_die(i, dice[i]));
         }
         return _results2;
       };

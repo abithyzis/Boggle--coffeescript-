@@ -8,39 +8,41 @@ Util =
       table.append(tr)
     table
 
+Display = (size) ->
+  table_data = ->
+    _.map [0...size], (row) ->
+      _.map [0...size], (col) ->
+        n = row * size + col
+        $("<td>").attr("id", "pos#{n}").css("height", "30px").css("width", "30px")
+
+  do ->
+    table = Util.build_table_from_2d_cell_array(table_data())
+    $("#boggle").append(table)
+
+  self =
+    square: (i) ->
+      $("#pos#{i}")
+    index: (element) ->
+      id = $(element).attr("id")
+      parseInt(id.match(/\d+/)[0])
+    place_die: (i, value) ->
+      self.square(i).html(value)
+    on_click_square: (callback) ->
+      handler = ->
+        i = self.index(this)
+        callback(i, $(this))
+      $("td").click handler
+    highlight: (pos) ->
+      self.square(pos).css("background", "white")
+    lowlight: (pos) ->
+      self.square(pos).css("background", "red")
+
+
 boggle = ->
   size = 4
   num_squares = size * size
-  board = ->
-    table_data = ->
-      _.map [0...size], (row) ->
-        _.map [0...size], (col) ->
-          n = row * size + col
-          $("<td>").attr("id", "pos#{n}").css("height", "30px").css("width", "30px")
-          
-    do ->
-      table = Util.build_table_from_2d_cell_array(table_data())
-      $("#boggle").append(table)
 
-    self =
-      square: (i) ->
-        $("#pos#{i}")
-      index: (element) ->
-        id = $(element).attr("id")
-        parseInt(id.match(/\d+/)[0])
-      place_die: (i, value) ->
-        self.square(i).html(value)
-      on_click_square: (callback) ->
-        handler = ->
-          i = self.index(this)
-          callback(i, $(this))
-        $("td").click handler
-      highlight: (pos) ->
-        self.square(pos).css("background", "white")
-      lowlight: (pos) ->
-        self.square(pos).css("background", "red")
-
-  word_entry = (b) ->
+  word_entry = (display) ->
     word_builder = ->
       square_indexes = []
       self =
@@ -60,12 +62,12 @@ boggle = ->
 
     word = word_builder()
     field = field_builder()
-    b.on_click_square (i, square) ->
+    display.on_click_square (i, square) ->
       if !word.legal(i)
         alert "illegal square choice" 
         return
       word.add(i)
-      touch_all_squares(word.legal, b.highlight, b.lowlight)
+      touch_all_squares(word.legal, display.highlight, display.lowlight)
       field.append("_" + square.html())
           
   is_adjacent = (s1, s2) ->
@@ -84,14 +86,14 @@ boggle = ->
         off_handler(square)
 
   do ->
-    b = board()
-    entry = word_entry(b)
+    display = Display(size)
+    entry = word_entry(display)
 
     shake_dice_onto_board = ->
       numbers = [0...num_squares]
       dice = _.sortBy(numbers, Math.random)
       for i in [0...num_squares] by 1
-        b.place_die(i, dice[i])
+        display.place_die(i, dice[i])
     shake_dice_onto_board()
   
 jQuery(document).ready ->
