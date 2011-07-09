@@ -78,33 +78,33 @@ Word_builder = (board) ->
       return "white" if self.in_reach(i)
       return "red"
 
+Word_entry = (board, display) ->
+  field_builder = ->
+    field = $("<pre>")
+    $("#boggle").append(field)
+    field
+
+  color_all_squares = ->
+    board.for_all_squares (i) ->
+      display.color(i, word.color(i))
+
+  word = Word_builder(board)
+  field = field_builder()
+  display.on_click_square (i) ->
+    if !word.legal(i)
+      alert "illegal square choice" 
+      return
+    word.add(i)
+    color_all_squares()
+    field.append("_" + board.get_letter(i))
+
 boggle = ->
   size = 4
 
-  word_entry = (board, display) ->
-    field_builder = ->
-      field = $("<pre>")
-      $("#boggle").append(field)
-      field
-
-    color_all_squares = ->
-      board.for_all_squares (i) ->
-        display.color(i, word.color(i))
-
-    word = Word_builder(board)
-    field = field_builder()
-    display.on_click_square (i) ->
-      if !word.legal(i)
-        alert "illegal square choice" 
-        return
-      word.add(i)
-      color_all_squares()
-      field.append("_" + board.get_letter(i))
-              
   do ->
     display = Display(size)
     board = Board(display, size)
-    entry = word_entry(board, display)
+    entry = Word_entry(board, display)
 
 jQuery(document).ready ->
   boggle()

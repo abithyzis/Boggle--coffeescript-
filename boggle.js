@@ -1,5 +1,5 @@
 (function() {
-  var Board, Display, Util, Word_builder, boggle;
+  var Board, Display, Util, Word_builder, Word_entry, boggle;
   var __indexOf = Array.prototype.indexOf || function(item) {
     for (var i = 0, l = this.length; i < l; i++) {
       if (this[i] === item) return i;
@@ -157,39 +157,39 @@
       }
     };
   };
-  boggle = function() {
-    var size, word_entry;
-    size = 4;
-    word_entry = function(board, display) {
-      var color_all_squares, field, field_builder, word;
-      field_builder = function() {
-        var field;
-        field = $("<pre>");
-        $("#boggle").append(field);
-        return field;
-      };
-      color_all_squares = function() {
-        return board.for_all_squares(function(i) {
-          return display.color(i, word.color(i));
-        });
-      };
-      word = Word_builder(board);
-      field = field_builder();
-      return display.on_click_square(function(i) {
-        if (!word.legal(i)) {
-          alert("illegal square choice");
-          return;
-        }
-        word.add(i);
-        color_all_squares();
-        return field.append("_" + board.get_letter(i));
+  Word_entry = function(board, display) {
+    var color_all_squares, field, field_builder, word;
+    field_builder = function() {
+      var field;
+      field = $("<pre>");
+      $("#boggle").append(field);
+      return field;
+    };
+    color_all_squares = function() {
+      return board.for_all_squares(function(i) {
+        return display.color(i, word.color(i));
       });
     };
+    word = Word_builder(board);
+    field = field_builder();
+    return display.on_click_square(function(i) {
+      if (!word.legal(i)) {
+        alert("illegal square choice");
+        return;
+      }
+      word.add(i);
+      color_all_squares();
+      return field.append("_" + board.get_letter(i));
+    });
+  };
+  boggle = function() {
+    var size;
+    size = 4;
     return (function() {
       var board, display, entry;
       display = Display(size);
       board = Board(display, size);
-      return entry = word_entry(board, display);
+      return entry = Word_entry(board, display);
     })();
   };
   jQuery(document).ready(function() {
