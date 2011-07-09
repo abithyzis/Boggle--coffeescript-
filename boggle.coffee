@@ -9,13 +9,13 @@ Util =
     table
 
 Display = (size) ->
-  table_data = ->
-    _.map [0...size], (row) ->
-      _.map [0...size], (col) ->
-        n = row * size + col
-        $("<td>").attr("id", "pos#{n}").css("height", "30px").css("width", "30px")
-
   do ->
+    table_data = ->
+      _.map [0...size], (row) ->
+        _.map [0...size], (col) ->
+          n = row * size + col
+          $("<td>").attr("id", "pos#{n}").css("height", "30px").css("width", "30px")
+
     table = Util.build_table_from_2d_cell_array(table_data())
     $("#boggle").append(table)
 
@@ -35,33 +35,33 @@ Display = (size) ->
     color: (pos, color) ->
       self.square(pos).css("background", color)
 
+Word_builder = (is_adjacent) ->
+  square_indexes = []
+  self =
+    add: (i) ->
+      square_indexes.push(i)
+    already_used: (i) ->
+      i in square_indexes
+    in_reach: (new_i) ->
+      return true if square_indexes.length == 0
+      last_square = self.last_square_selected()
+      is_adjacent(last_square, new_i) 
+    legal: (new_i) ->
+      self.in_reach(new_i) && !self.already_used(new_i)
+    last_square_selected: () ->
+      return undefined if square_indexes.length == 0
+      square_indexes[square_indexes.length - 1]
+    color: (i) ->
+      return "lightgreen" if i == self.last_square_selected()
+      return "lightblue" if self.already_used(i)
+      return "white" if self.in_reach(i)
+      return "red"
+
 boggle = ->
   size = 4
   num_squares = size * size
 
-  word_entry = (display) ->
-    word_builder = ->
-      square_indexes = []
-      self =
-        add: (i) ->
-          square_indexes.push(i)
-        already_used: (i) ->
-          i in square_indexes
-        in_reach: (new_i) ->
-          return true if square_indexes.length == 0
-          last_square = self.last_square_selected()
-          is_adjacent(last_square, new_i) 
-        legal: (new_i) ->
-          self.in_reach(new_i) && !self.already_used(new_i)
-        last_square_selected: () ->
-          return undefined if square_indexes.length == 0
-          square_indexes[square_indexes.length - 1]
-        color: (i) ->
-          return "lightgreen" if i == self.last_square_selected()
-          return "lightblue" if self.already_used(i)
-          return "white" if self.in_reach(i)
-          return "red"
-          
+  word_entry = (display, is_adjacent) ->
     field_builder = ->
       field = $("<pre>")
       $("#boggle").append(field)
@@ -71,7 +71,7 @@ boggle = ->
       for_all_squares (i) ->
         display.color(i, word.color(i))
 
-    word = word_builder()
+    word = Word_builder(is_adjacent)
     field = field_builder()
     display.on_click_square (i, square) ->
       if !word.legal(i)
@@ -95,7 +95,7 @@ boggle = ->
 
   do ->
     display = Display(size)
-    entry = word_entry(display)
+    entry = word_entry(display, is_adjacent)
 
     shake_dice_onto_board = ->
       numbers = [0...num_squares]

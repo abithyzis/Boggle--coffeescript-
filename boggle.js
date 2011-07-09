@@ -1,5 +1,5 @@
 (function() {
-  var Display, Util, boggle;
+  var Display, Util, Word_builder, boggle;
   var __indexOf = Array.prototype.indexOf || function(item) {
     for (var i = 0, l = this.length; i < l; i++) {
       if (this[i] === item) return i;
@@ -23,28 +23,28 @@
     }
   };
   Display = function(size) {
-    var self, table_data;
-    table_data = function() {
-      var _i, _results;
-      return _.map((function() {
-        _results = [];
-        for (var _i = 0; 0 <= size ? _i < size : _i > size; 0 <= size ? _i += 1 : _i -= 1){ _results.push(_i); }
-        return _results;
-      }).apply(this, arguments), function(row) {
+    var self;
+    (function() {
+      var table, table_data;
+      table_data = function() {
         var _i, _results;
         return _.map((function() {
           _results = [];
           for (var _i = 0; 0 <= size ? _i < size : _i > size; 0 <= size ? _i += 1 : _i -= 1){ _results.push(_i); }
           return _results;
-        }).apply(this, arguments), function(col) {
-          var n;
-          n = row * size + col;
-          return $("<td>").attr("id", "pos" + n).css("height", "30px").css("width", "30px");
+        }).apply(this, arguments), function(row) {
+          var _i, _results;
+          return _.map((function() {
+            _results = [];
+            for (var _i = 0; 0 <= size ? _i < size : _i > size; 0 <= size ? _i += 1 : _i -= 1){ _results.push(_i); }
+            return _results;
+          }).apply(this, arguments), function(col) {
+            var n;
+            n = row * size + col;
+            return $("<td>").attr("id", "pos" + n).css("height", "30px").css("width", "30px");
+          });
         });
-      });
-    };
-    (function() {
-      var table;
+      };
       table = Util.build_table_from_2d_cell_array(table_data());
       return $("#boggle").append(table);
     })();
@@ -74,53 +74,53 @@
       }
     };
   };
+  Word_builder = function(is_adjacent) {
+    var self, square_indexes;
+    square_indexes = [];
+    return self = {
+      add: function(i) {
+        return square_indexes.push(i);
+      },
+      already_used: function(i) {
+        return __indexOf.call(square_indexes, i) >= 0;
+      },
+      in_reach: function(new_i) {
+        var last_square;
+        if (square_indexes.length === 0) {
+          return true;
+        }
+        last_square = self.last_square_selected();
+        return is_adjacent(last_square, new_i);
+      },
+      legal: function(new_i) {
+        return self.in_reach(new_i) && !self.already_used(new_i);
+      },
+      last_square_selected: function() {
+        if (square_indexes.length === 0) {
+          return;
+        }
+        return square_indexes[square_indexes.length - 1];
+      },
+      color: function(i) {
+        if (i === self.last_square_selected()) {
+          return "lightgreen";
+        }
+        if (self.already_used(i)) {
+          return "lightblue";
+        }
+        if (self.in_reach(i)) {
+          return "white";
+        }
+        return "red";
+      }
+    };
+  };
   boggle = function() {
     var for_all_squares, is_adjacent, num_squares, size, word_entry;
     size = 4;
     num_squares = size * size;
-    word_entry = function(display) {
-      var color_all_squares, field, field_builder, word, word_builder;
-      word_builder = function() {
-        var self, square_indexes;
-        square_indexes = [];
-        return self = {
-          add: function(i) {
-            return square_indexes.push(i);
-          },
-          already_used: function(i) {
-            return __indexOf.call(square_indexes, i) >= 0;
-          },
-          in_reach: function(new_i) {
-            var last_square;
-            if (square_indexes.length === 0) {
-              return true;
-            }
-            last_square = self.last_square_selected();
-            return is_adjacent(last_square, new_i);
-          },
-          legal: function(new_i) {
-            return self.in_reach(new_i) && !self.already_used(new_i);
-          },
-          last_square_selected: function() {
-            if (square_indexes.length === 0) {
-              return;
-            }
-            return square_indexes[square_indexes.length - 1];
-          },
-          color: function(i) {
-            if (i === self.last_square_selected()) {
-              return "lightgreen";
-            }
-            if (self.already_used(i)) {
-              return "lightblue";
-            }
-            if (self.in_reach(i)) {
-              return "white";
-            }
-            return "red";
-          }
-        };
-      };
+    word_entry = function(display, is_adjacent) {
+      var color_all_squares, field, field_builder, word;
       field_builder = function() {
         var field;
         field = $("<pre>");
@@ -132,7 +132,7 @@
           return display.color(i, word.color(i));
         });
       };
-      word = word_builder();
+      word = Word_builder(is_adjacent);
       field = field_builder();
       return display.on_click_square(function(i, square) {
         if (!word.legal(i)) {
@@ -166,7 +166,7 @@
     return (function() {
       var display, entry, shake_dice_onto_board;
       display = Display(size);
-      entry = word_entry(display);
+      entry = word_entry(display, is_adjacent);
       shake_dice_onto_board = function() {
         var dice, i, numbers, _i, _results, _results2;
         numbers = (function() {
