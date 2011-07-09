@@ -26,10 +26,8 @@ DiceShaker =
 Board = (display, size, letter_dice) ->
   num_squares = size * size
   dice = DiceShaker.shake(num_squares, letter_dice)
-  shake_dice_onto_board = ->
-    for die, i in dice
-      display.place_die(i, die)
-  shake_dice_onto_board()
+  for die, i in dice
+    display.place_die(i, die)
   self =
     get_letter: (i) -> dice[i]
     for_all_squares: (f) ->
@@ -78,14 +76,14 @@ Display = (size) ->
       word_entry_span.html('')
       field = $("<pre>")
       word_entry_span.append(field)
-      back_button = $("<input type='button'>")
-      back_button.attr("value", "BACK")
-      word_entry_span.append(back_button)
-      back_button.hide()
-      save_button = $("<input type='button'>")
-      save_button.attr("value", "SAVE")
-      word_entry_span.append(save_button)
-      save_button.hide()
+      append_hidden_button = (label) ->
+        button = $("<input type='button'>")
+        button.attr("value", label)
+        word_entry_span.append(button)
+        button.hide()
+        button
+      back_button = append_hidden_button("BACK")
+      save_button = append_hidden_button("SAVE")
       self =
         field:
           set: (text) -> field.html(text)
@@ -120,8 +118,8 @@ Word_builder = (board) ->
       last_square = self.last_square_selected()
       board.is_adjacent(last_square, new_i) 
     validate_new_letter: (new_i) ->
-      throw "out of reach" if !self.in_reach(new_i)
       throw "already used" if self.already_used(new_i)
+      throw "out of reach" if !self.in_reach(new_i)
     last_square_selected: () ->
       return undefined if square_indexes.length == 0
       square_indexes[square_indexes.length - 1]
@@ -130,7 +128,7 @@ Word_builder = (board) ->
         return "lightgreen" if i == self.last_square_selected()
         return "lightblue" if self.already_used(i)
         return "white" if self.in_reach(i)
-        return "red"
+        return "#DDD"
       board.for_all_squares (i) ->
         display.color(i, color(i))
         

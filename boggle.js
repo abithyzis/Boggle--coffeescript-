@@ -53,19 +53,13 @@
     }
   };
   Board = function(display, size, letter_dice) {
-    var dice, num_squares, self, shake_dice_onto_board;
+    var dice, die, i, num_squares, self, _len;
     num_squares = size * size;
     dice = DiceShaker.shake(num_squares, letter_dice);
-    shake_dice_onto_board = function() {
-      var die, i, _len, _results;
-      _results = [];
-      for (i = 0, _len = dice.length; i < _len; i++) {
-        die = dice[i];
-        _results.push(display.place_die(i, die));
-      }
-      return _results;
-    };
-    shake_dice_onto_board();
+    for (i = 0, _len = dice.length; i < _len; i++) {
+      die = dice[i];
+      display.place_die(i, die);
+    }
     return self = {
       get_letter: function(i) {
         return dice[i];
@@ -145,18 +139,20 @@
         return self.square(pos).css("background", color);
       },
       word_entry: function() {
-        var back_button, field, save_button, self;
+        var append_hidden_button, back_button, field, save_button, self;
         word_entry_span.html('');
         field = $("<pre>");
         word_entry_span.append(field);
-        back_button = $("<input type='button'>");
-        back_button.attr("value", "BACK");
-        word_entry_span.append(back_button);
-        back_button.hide();
-        save_button = $("<input type='button'>");
-        save_button.attr("value", "SAVE");
-        word_entry_span.append(save_button);
-        save_button.hide();
+        append_hidden_button = function(label) {
+          var button;
+          button = $("<input type='button'>");
+          button.attr("value", label);
+          word_entry_span.append(button);
+          button.hide();
+          return button;
+        };
+        back_button = append_hidden_button("BACK");
+        save_button = append_hidden_button("SAVE");
         return self = {
           field: {
             set: function(text) {
@@ -222,11 +218,11 @@
         return board.is_adjacent(last_square, new_i);
       },
       validate_new_letter: function(new_i) {
-        if (!self.in_reach(new_i)) {
-          throw "out of reach";
-        }
         if (self.already_used(new_i)) {
           throw "already used";
+        }
+        if (!self.in_reach(new_i)) {
+          throw "out of reach";
         }
       },
       last_square_selected: function() {
@@ -247,7 +243,7 @@
           if (self.in_reach(i)) {
             return "white";
           }
-          return "red";
+          return "#DDD";
         };
         return board.for_all_squares(function(i) {
           return display.color(i, color(i));
