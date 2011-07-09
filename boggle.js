@@ -61,7 +61,9 @@
         on_click_square: function(callback) {
           var handler;
           handler = function() {
-            return callback(self.index(this));
+            var i;
+            i = self.index(this);
+            return callback(i, $(this));
           };
           return $("td").click(handler);
         },
@@ -73,11 +75,19 @@
         }
       };
     };
-    word_entry = function() {
+    word_entry = function(board) {
       var field;
       field = $("<pre>");
       $("#boggle").append(field);
-      return field.html("ENTER WORD");
+      field.html("ENTER WORD");
+      return b.on_click_square(function(i, square) {
+        var f;
+        f = function(j) {
+          return is_adjacent(i, j);
+        };
+        touch_all_squares(f, b.highlight, b.lowlight);
+        return field.append(square.html());
+      });
     };
     is_adjacent = function(s1, s2) {
       var c1, c2, r1, r2;
@@ -99,14 +109,7 @@
       return _results;
     };
     b = board();
-    b.on_click_square(function(square) {
-      var f;
-      f = function(i) {
-        return is_adjacent(i, square);
-      };
-      return touch_all_squares(f, b.highlight, b.lowlight);
-    });
-    entry = word_entry();
+    entry = word_entry(b);
     shake_dice_onto_board = function() {
       var dice, i, numbers, _i, _results, _results2;
       numbers = (function() {

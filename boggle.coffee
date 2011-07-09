@@ -32,18 +32,24 @@ boggle = ->
         self.square(i).html(value)
       on_click_square: (callback) ->
         handler = ->
-          callback(self.index(this))
+          i = self.index(this)
+          callback(i, $(this))
         $("td").click handler
       highlight: (pos) ->
         self.square(pos).css("background", "green")
       lowlight: (pos) ->
         self.square(pos).css("background", "white")
 
-  word_entry = ->
+  word_entry = (board) ->
     field = $("<pre>")
     $("#boggle").append(field)
     field.html("ENTER WORD")
-    
+    b.on_click_square (i, square) ->
+      f = (j) ->
+        is_adjacent(i, j)
+      touch_all_squares(f, b.highlight, b.lowlight)
+      field.append(square.html())
+          
   is_adjacent = (s1, s2) ->
     return false if s1 == s2
     r1 = Math.floor(s1 / size)
@@ -60,12 +66,7 @@ boggle = ->
         off_handler(square)
       
   b = board()
-  b.on_click_square (square) ->
-    f = (i) ->
-      is_adjacent(i, square)
-    touch_all_squares(f, b.highlight, b.lowlight)
-
-  entry = word_entry()
+  entry = word_entry(b)
 
   shake_dice_onto_board = ->
     numbers = [0...num_squares]
