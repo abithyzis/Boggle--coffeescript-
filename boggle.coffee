@@ -56,6 +56,9 @@ Display = (size) ->
 
   word_entry_span = $("<span>")
   $("#boggle").append(word_entry_span)
+  scratchpad  = $("<pre>")
+  $("#boggle").append("<h2>Answers</h2>")
+  $("#boggle").append(scratchpad)
 
   self =
     square: (i) ->
@@ -79,6 +82,10 @@ Display = (size) ->
       back_button.attr("value", "BACK")
       word_entry_span.append(back_button)
       back_button.hide()
+      save_button = $("<input type='button'>")
+      save_button.attr("value", "SAVE")
+      word_entry_span.append(save_button)
+      save_button.hide()
       self =
         field:
           set: (text) -> field.html(text)
@@ -86,6 +93,14 @@ Display = (size) ->
           hide: -> back_button.hide()
           show: -> back_button.show()
           on_click: (f) -> back_button.click(f)
+        save_button:
+          hide: -> save_button.hide()
+          show: -> save_button.show()
+          on_click: (f) -> save_button.click(f)
+    scratchpad:
+      add_word: (s) ->
+        console.log("added #{s}")
+        scratchpad.append(s + "\n") 
         
 Word_builder = (board) ->
   square_indexes = []
@@ -104,34 +119,40 @@ Word_builder = (board) ->
       return true if square_indexes.length == 0
       last_square = self.last_square_selected()
       board.is_adjacent(last_square, new_i) 
-    legal: (new_i) ->
-      self.in_reach(new_i) && !self.already_used(new_i)
+    validate_new_letter: (new_i) ->
+      throw "out of reach" if !self.in_reach(new_i)
+      throw "already used" if self.already_used(new_i)
     last_square_selected: () ->
       return undefined if square_indexes.length == 0
       square_indexes[square_indexes.length - 1]
-    color: (i) ->
-      return "lightgreen" if i == self.last_square_selected()
-      return "lightblue" if self.already_used(i)
-      return "white" if self.in_reach(i)
-      return "red"
-
+    redraw_board: (display) ->
+      color = (i) ->
+        return "lightgreen" if i == self.last_square_selected()
+        return "lightblue" if self.already_used(i)
+        return "white" if self.in_reach(i)
+        return "red"
+      board.for_all_squares (i) ->
+        display.color(i, color(i))
+        
 Word_entry = (board, display) ->
-  color_all_squares = ->
-    board.for_all_squares (i) ->
-      display.color(i, word.color(i))
-
+  word = Word_builder(board)
+    
   redraw = ->
-    color_all_squares()
+    word.redraw_board(display)
     text = word.text()
     field.set(text)
     if text.length > 0
      back_button.show()
+     save_button.show()
     else
       back_button.hide()
+      save_button.hide()
   
   on_click_letter = (i) ->
-    if !word.legal(i)
-      alert "illegal square choice" 
+    try
+      word.validate_new_letter(i)
+    catch error
+      alert error
       return
     word.add(i)
     redraw()
@@ -140,11 +161,17 @@ Word_entry = (board, display) ->
     word.backspace()
     redraw()
 
-  word = Word_builder(board)
-  {field, back_button} = display.word_entry()
+  save = ->
+    display.scratchpad.add_word(word.text())
+    word = Word_builder(board)
+    redraw()
+
+  {field, back_button, save_button} = display.word_entry()
+  word.redraw_board(display)
 
   display.on_click_square on_click_letter
   back_button.on_click backspace
+  save_button.on_click save
 
 LetterDice =
   [
@@ -172,7 +199,7 @@ boggle = ->
   do ->
     display = Display(size)
     board = Board(display, size, LetterDice)
-    entry = Word_entry(board, display)
+    Word_entry(board, display)
 
 jQuery(document).ready ->
   boggle()

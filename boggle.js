@@ -92,7 +92,7 @@
     };
   };
   Display = function(size) {
-    var self, word_entry_span;
+    var scratchpad, self, word_entry_span;
     (function() {
       var table, table_data;
       table_data = function() {
@@ -119,6 +119,9 @@
     })();
     word_entry_span = $("<span>");
     $("#boggle").append(word_entry_span);
+    scratchpad = $("<pre>");
+    $("#boggle").append("<h2>Answers</h2>");
+    $("#boggle").append(scratchpad);
     return self = {
       square: function(i) {
         return $("#pos" + i);
@@ -142,7 +145,7 @@
         return self.square(pos).css("background", color);
       },
       word_entry: function() {
-        var back_button, field, self;
+        var back_button, field, save_button, self;
         word_entry_span.html('');
         field = $("<pre>");
         word_entry_span.append(field);
@@ -150,6 +153,10 @@
         back_button.attr("value", "BACK");
         word_entry_span.append(back_button);
         back_button.hide();
+        save_button = $("<input type='button'>");
+        save_button.attr("value", "SAVE");
+        word_entry_span.append(save_button);
+        save_button.hide();
         return self = {
           field: {
             set: function(text) {
@@ -166,8 +173,25 @@
             on_click: function(f) {
               return back_button.click(f);
             }
+          },
+          save_button: {
+            hide: function() {
+              return save_button.hide();
+            },
+            show: function() {
+              return save_button.show();
+            },
+            on_click: function(f) {
+              return save_button.click(f);
+            }
           }
         };
+      },
+      scratchpad: {
+        add_word: function(s) {
+          console.log("added " + s);
+          return scratchpad.append(s + "\n");
+        }
       }
     };
   };
@@ -197,8 +221,13 @@
         last_square = self.last_square_selected();
         return board.is_adjacent(last_square, new_i);
       },
-      legal: function(new_i) {
-        return self.in_reach(new_i) && !self.already_used(new_i);
+      validate_new_letter: function(new_i) {
+        if (!self.in_reach(new_i)) {
+          throw "out of reach";
+        }
+        if (self.already_used(new_i)) {
+          throw "already used";
+        }
       },
       last_square_selected: function() {
         if (square_indexes.length === 0) {
@@ -206,41 +235,47 @@
         }
         return square_indexes[square_indexes.length - 1];
       },
-      color: function(i) {
-        if (i === self.last_square_selected()) {
-          return "lightgreen";
-        }
-        if (self.already_used(i)) {
-          return "lightblue";
-        }
-        if (self.in_reach(i)) {
-          return "white";
-        }
-        return "red";
+      redraw_board: function(display) {
+        var color;
+        color = function(i) {
+          if (i === self.last_square_selected()) {
+            return "lightgreen";
+          }
+          if (self.already_used(i)) {
+            return "lightblue";
+          }
+          if (self.in_reach(i)) {
+            return "white";
+          }
+          return "red";
+        };
+        return board.for_all_squares(function(i) {
+          return display.color(i, color(i));
+        });
       }
     };
   };
   Word_entry = function(board, display) {
-    var back_button, backspace, color_all_squares, field, on_click_letter, redraw, word, _ref;
-    color_all_squares = function() {
-      return board.for_all_squares(function(i) {
-        return display.color(i, word.color(i));
-      });
-    };
+    var back_button, backspace, field, on_click_letter, redraw, save, save_button, word, _ref;
+    word = Word_builder(board);
     redraw = function() {
       var text;
-      color_all_squares();
+      word.redraw_board(display);
       text = word.text();
       field.set(text);
       if (text.length > 0) {
-        return back_button.show();
+        back_button.show();
+        return save_button.show();
       } else {
-        return back_button.hide();
+        back_button.hide();
+        return save_button.hide();
       }
     };
     on_click_letter = function(i) {
-      if (!word.legal(i)) {
-        alert("illegal square choice");
+      try {
+        word.validate_new_letter(i);
+      } catch (error) {
+        alert(error);
         return;
       }
       word.add(i);
@@ -250,20 +285,26 @@
       word.backspace();
       return redraw();
     };
-    word = Word_builder(board);
-    _ref = display.word_entry(), field = _ref.field, back_button = _ref.back_button;
+    save = function() {
+      display.scratchpad.add_word(word.text());
+      word = Word_builder(board);
+      return redraw();
+    };
+    _ref = display.word_entry(), field = _ref.field, back_button = _ref.back_button, save_button = _ref.save_button;
+    word.redraw_board(display);
     display.on_click_square(on_click_letter);
-    return back_button.on_click(backspace);
+    back_button.on_click(backspace);
+    return save_button.on_click(save);
   };
   LetterDice = ["AAEEGN", "ELRTTY", "AOOTTW", "ABBJOO", "EHRTVW", "CIMOTU", "DISTTY", "EIOSST", "DELRVY", "ACHOPS", "HIMNQU", "EEINSU", "EEGHNW", "AFFKPS", "HLNNRZ", "DEILRX"];
   boggle = function() {
     var size;
     size = 4;
     return (function() {
-      var board, display, entry;
+      var board, display;
       display = Display(size);
       board = Board(display, size, LetterDice);
-      return entry = Word_entry(board, display);
+      return Word_entry(board, display);
     })();
   };
   jQuery(document).ready(function() {
