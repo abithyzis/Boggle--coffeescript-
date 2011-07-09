@@ -68,13 +68,20 @@ Display = (size) ->
       $("td").click handler
     color: (pos, color) ->
       self.square(pos).css("background", color)
-    word_entry:
-      field: ->
-        field = $("<pre>")
-        $("#boggle").append(field)
-        self =
+    word_entry: ->
+      span = $("<span>")
+      $("#boggle").append(span)
+      field = $("<pre>")
+      span.append(field)
+      back_button = $("<input type='button'>")
+      back_button.attr("value", "BACK")
+      span.append(back_button)
+      self =
+        field:
           set: (text) -> field.html(text)
-
+        back_button:
+          back_button
+        
 Word_builder = (board) ->
   square_indexes = []
   self =
@@ -107,7 +114,7 @@ Word_entry = (board, display) ->
       display.color(i, word.color(i))
 
   word = Word_builder(board)
-  field = display.word_entry.field()
+  {field, back_button} = display.word_entry()
   display.on_click_square (i) ->
     if !word.legal(i)
       alert "illegal square choice" 

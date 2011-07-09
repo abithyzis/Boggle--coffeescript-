@@ -139,17 +139,23 @@
       color: function(pos, color) {
         return self.square(pos).css("background", color);
       },
-      word_entry: {
-        field: function() {
-          var field, self;
-          field = $("<pre>");
-          $("#boggle").append(field);
-          return self = {
+      word_entry: function() {
+        var back_button, field, self, span;
+        span = $("<span>");
+        $("#boggle").append(span);
+        field = $("<pre>");
+        span.append(field);
+        back_button = $("<input type='button'>");
+        back_button.attr("value", "BACK");
+        span.append(back_button);
+        return self = {
+          field: {
             set: function(text) {
               return field.html(text);
             }
-          };
-        }
+          },
+          back_button: back_button
+        };
       }
     };
   };
@@ -200,14 +206,14 @@
     };
   };
   Word_entry = function(board, display) {
-    var color_all_squares, field, word;
+    var back_button, color_all_squares, field, word, _ref;
     color_all_squares = function() {
       return board.for_all_squares(function(i) {
         return display.color(i, word.color(i));
       });
     };
     word = Word_builder(board);
-    field = display.word_entry.field();
+    _ref = display.word_entry(), field = _ref.field, back_button = _ref.back_button;
     return display.on_click_square(function(i) {
       if (!word.legal(i)) {
         alert("illegal square choice");
