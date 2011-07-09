@@ -20,7 +20,9 @@ Board = (display, size, letter_dice) ->
     numbers = [0...num_squares]
     dice = Util.shuffle_array(numbers)
     dice = _.map dice, (die) ->
-      Util.random_char letter_dice[die]
+      letter = Util.random_char letter_dice[die]
+      letter = 'QU' if letter == 'Q'
+      letter
     for die, i in dice
       display.place_die(i, die)
   shake_dice_onto_board()
@@ -62,6 +64,12 @@ Display = (size) ->
       $("td").click handler
     color: (pos, color) ->
       self.square(pos).css("background", color)
+    word_entry_field: ->
+      field = $("<pre>")
+      $("#boggle").append(field)
+      field
+
+      
 
 Word_builder = (board) ->
   square_indexes = []
@@ -90,24 +98,19 @@ Word_builder = (board) ->
       return "red"
 
 Word_entry = (board, display) ->
-  field_builder = ->
-    field = $("<pre>")
-    $("#boggle").append(field)
-    field
-
   color_all_squares = ->
     board.for_all_squares (i) ->
       display.color(i, word.color(i))
 
   word = Word_builder(board)
-  field = field_builder()
+  field = display.word_entry_field()
   display.on_click_square (i) ->
     if !word.legal(i)
       alert "illegal square choice" 
       return
     word.add(i)
     color_all_squares()
-    file.html(word.text())
+    field.html(word.text())
 
 LetterDice =
   [

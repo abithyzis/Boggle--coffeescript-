@@ -43,7 +43,12 @@
       }).apply(this, arguments);
       dice = Util.shuffle_array(numbers);
       dice = _.map(dice, function(die) {
-        return Util.random_char(letter_dice[die]);
+        var letter;
+        letter = Util.random_char(letter_dice[die]);
+        if (letter === 'Q') {
+          letter = 'QU';
+        }
+        return letter;
       });
       _results2 = [];
       for (i = 0, _len = dice.length; i < _len; i++) {
@@ -125,6 +130,12 @@
       },
       color: function(pos, color) {
         return self.square(pos).css("background", color);
+      },
+      word_entry_field: function() {
+        var field;
+        field = $("<pre>");
+        $("#boggle").append(field);
+        return field;
       }
     };
   };
@@ -170,25 +181,19 @@
         if (self.in_reach(i)) {
           return "white";
         }
-        return "#DDD";
+        return "red";
       }
     };
   };
   Word_entry = function(board, display) {
-    var color_all_squares, field, field_builder, word;
-    field_builder = function() {
-      var field;
-      field = $("<pre>");
-      $("#boggle").append(field);
-      return field;
-    };
+    var color_all_squares, field, word;
     color_all_squares = function() {
       return board.for_all_squares(function(i) {
         return display.color(i, word.color(i));
       });
     };
     word = Word_builder(board);
-    field = field_builder();
+    field = display.word_entry_field();
     return display.on_click_square(function(i) {
       if (!word.legal(i)) {
         alert("illegal square choice");
