@@ -13,16 +13,20 @@ Util =
     i = Math.floor(Math.random() * s.length)
     s.charAt(i)
   
-Board = (display, size, letter_dice) ->
-  dice = []
-  num_squares = size * size
-  shake_dice_onto_board = ->
+DiceShaker =
+  shake: (num_squares, letter_dice) ->
+    throw "unexpected number of dice" if num_squares != letter_dice.length
     numbers = [0...num_squares]
     dice = Util.shuffle_array(numbers)
-    dice = _.map dice, (die) ->
+    _.map dice, (die) ->
       letter = Util.random_char letter_dice[die]
       letter = 'QU' if letter == 'Q'
       letter
+  
+Board = (display, size, letter_dice) ->
+  num_squares = size * size
+  dice = DiceShaker.shake(num_squares, letter_dice)
+  shake_dice_onto_board = ->
     for die, i in dice
       display.place_die(i, die)
   shake_dice_onto_board()

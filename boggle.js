@@ -1,5 +1,5 @@
 (function() {
-  var Board, Display, LetterDice, Util, Word_builder, Word_entry, boggle;
+  var Board, DiceShaker, Display, LetterDice, Util, Word_builder, Word_entry, boggle;
   var __indexOf = Array.prototype.indexOf || function(item) {
     for (var i = 0, l = this.length; i < l; i++) {
       if (this[i] === item) return i;
@@ -30,19 +30,19 @@
       return s.charAt(i);
     }
   };
-  Board = function(display, size, letter_dice) {
-    var dice, num_squares, self, shake_dice_onto_board;
-    dice = [];
-    num_squares = size * size;
-    shake_dice_onto_board = function() {
-      var die, i, numbers, _i, _len, _results, _results2;
+  DiceShaker = {
+    shake: function(num_squares, letter_dice) {
+      var dice, numbers, _i, _results;
+      if (num_squares !== letter_dice.length) {
+        throw "unexpected number of dice";
+      }
       numbers = (function() {
         _results = [];
         for (var _i = 0; 0 <= num_squares ? _i < num_squares : _i > num_squares; 0 <= num_squares ? _i += 1 : _i -= 1){ _results.push(_i); }
         return _results;
       }).apply(this, arguments);
       dice = Util.shuffle_array(numbers);
-      dice = _.map(dice, function(die) {
+      return _.map(dice, function(die) {
         var letter;
         letter = Util.random_char(letter_dice[die]);
         if (letter === 'Q') {
@@ -50,12 +50,20 @@
         }
         return letter;
       });
-      _results2 = [];
+    }
+  };
+  Board = function(display, size, letter_dice) {
+    var dice, num_squares, self, shake_dice_onto_board;
+    num_squares = size * size;
+    dice = DiceShaker.shake(num_squares, letter_dice);
+    shake_dice_onto_board = function() {
+      var die, i, _len, _results;
+      _results = [];
       for (i = 0, _len = dice.length; i < _len; i++) {
         die = dice[i];
-        _results2.push(display.place_die(i, die));
+        _results.push(display.place_die(i, die));
       }
-      return _results2;
+      return _results;
     };
     shake_dice_onto_board();
     return self = {
