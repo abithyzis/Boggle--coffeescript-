@@ -1,5 +1,5 @@
 (function() {
-  var Display, Util, Word_builder, boggle;
+  var Board, Display, Util, Word_builder, boggle;
   var __indexOf = Array.prototype.indexOf || function(item) {
     for (var i = 0, l = this.length; i < l; i++) {
       if (this[i] === item) return i;
@@ -21,6 +21,39 @@
       }
       return table;
     }
+  };
+  Board = function(display, size) {
+    var dice, num_squares, self, shake_dice_onto_board;
+    dice = [];
+    num_squares = size * size;
+    shake_dice_onto_board = function() {
+      var i, numbers, _i, _results, _results2;
+      numbers = (function() {
+        _results = [];
+        for (var _i = 0; 0 <= num_squares ? _i < num_squares : _i > num_squares; 0 <= num_squares ? _i += 1 : _i -= 1){ _results.push(_i); }
+        return _results;
+      }).apply(this, arguments);
+      dice = _.sortBy(numbers, Math.random);
+      _results2 = [];
+      for (i = 0; (0 <= num_squares ? i < num_squares : i > num_squares); i += 1) {
+        _results2.push(display.place_die(i, dice[i]));
+      }
+      return _results2;
+    };
+    shake_dice_onto_board();
+    return self = {
+      get_letter: function(i) {
+        return dice[i];
+      },
+      for_all_squares: function(f) {
+        var square, _results;
+        _results = [];
+        for (square = 0; (0 <= num_squares ? square < num_squares : square > num_squares); square += 1) {
+          _results.push(f(square));
+        }
+        return _results;
+      }
+    };
   };
   Display = function(size) {
     var self;
@@ -63,9 +96,7 @@
       on_click_square: function(callback) {
         var handler;
         handler = function() {
-          var i;
-          i = self.index(this);
-          return callback(i, $(this));
+          return callback(self.index(this));
         };
         return $("td").click(handler);
       },
@@ -116,10 +147,9 @@
     };
   };
   boggle = function() {
-    var for_all_squares, is_adjacent, num_squares, size, word_entry;
+    var is_adjacent, size, word_entry;
     size = 4;
-    num_squares = size * size;
-    word_entry = function(display, is_adjacent) {
+    word_entry = function(board, display, is_adjacent) {
       var color_all_squares, field, field_builder, word;
       field_builder = function() {
         var field;
@@ -128,20 +158,20 @@
         return field;
       };
       color_all_squares = function() {
-        return for_all_squares(function(i) {
+        return board.for_all_squares(function(i) {
           return display.color(i, word.color(i));
         });
       };
       word = Word_builder(is_adjacent);
       field = field_builder();
-      return display.on_click_square(function(i, square) {
+      return display.on_click_square(function(i) {
         if (!word.legal(i)) {
           alert("illegal square choice");
           return;
         }
         word.add(i);
         color_all_squares();
-        return field.append("_" + square.html());
+        return field.append("_" + board.get_letter(i));
       });
     };
     is_adjacent = function(s1, s2) {
@@ -155,33 +185,11 @@
       c2 = s2 % size;
       return (Math.abs(r1 - r2) <= 1) && (Math.abs(c1 - c2) <= 1);
     };
-    for_all_squares = function(f) {
-      var square, _results;
-      _results = [];
-      for (square = 0; (0 <= num_squares ? square < num_squares : square > num_squares); square += 1) {
-        _results.push(f(square));
-      }
-      return _results;
-    };
     return (function() {
-      var display, entry, shake_dice_onto_board;
+      var board, display, entry;
       display = Display(size);
-      entry = word_entry(display, is_adjacent);
-      shake_dice_onto_board = function() {
-        var dice, i, numbers, _i, _results, _results2;
-        numbers = (function() {
-          _results = [];
-          for (var _i = 0; 0 <= num_squares ? _i < num_squares : _i > num_squares; 0 <= num_squares ? _i += 1 : _i -= 1){ _results.push(_i); }
-          return _results;
-        }).apply(this, arguments);
-        dice = _.sortBy(numbers, Math.random);
-        _results2 = [];
-        for (i = 0; (0 <= num_squares ? i < num_squares : i > num_squares); i += 1) {
-          _results2.push(display.place_die(i, dice[i]));
-        }
-        return _results2;
-      };
-      return shake_dice_onto_board();
+      board = Board(display, size);
+      return entry = word_entry(board, display, is_adjacent);
     })();
   };
   jQuery(document).ready(function() {

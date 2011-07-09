@@ -8,6 +8,21 @@ Util =
       table.append(tr)
     table
 
+Board = (display, size) ->
+  dice = []
+  num_squares = size * size
+  shake_dice_onto_board = ->
+    numbers = [0...num_squares]
+    dice = _.sortBy(numbers, Math.random)
+    for i in [0...num_squares] by 1
+      display.place_die(i, dice[i])
+  shake_dice_onto_board()
+  self =
+    get_letter: (i) -> dice[i]
+    for_all_squares: (f) ->
+      for square in [0...num_squares] by 1
+        f(square)
+
 Display = (size) ->
   do ->
     table_data = ->
@@ -29,8 +44,7 @@ Display = (size) ->
       self.square(i).html(value)
     on_click_square: (callback) ->
       handler = ->
-        i = self.index(this)
-        callback(i, $(this))
+        callback(self.index(this))
       $("td").click handler
     color: (pos, color) ->
       self.square(pos).css("background", color)
@@ -59,27 +73,26 @@ Word_builder = (is_adjacent) ->
 
 boggle = ->
   size = 4
-  num_squares = size * size
 
-  word_entry = (display, is_adjacent) ->
+  word_entry = (board, display, is_adjacent) ->
     field_builder = ->
       field = $("<pre>")
       $("#boggle").append(field)
       field
 
     color_all_squares = ->
-      for_all_squares (i) ->
+      board.for_all_squares (i) ->
         display.color(i, word.color(i))
 
     word = Word_builder(is_adjacent)
     field = field_builder()
-    display.on_click_square (i, square) ->
+    display.on_click_square (i) ->
       if !word.legal(i)
         alert "illegal square choice" 
         return
       word.add(i)
       color_all_squares()
-      field.append("_" + square.html())
+      field.append("_" + board.get_letter(i))
           
   is_adjacent = (s1, s2) ->
     return false if s1 == s2
@@ -89,20 +102,10 @@ boggle = ->
     c2 = s2 % size
     return (Math.abs(r1-r2) <= 1) && (Math.abs(c1-c2) <= 1)
     
-  for_all_squares = (f) ->
-    for square in [0...num_squares] by 1
-      f(square)
-
   do ->
     display = Display(size)
-    entry = word_entry(display, is_adjacent)
+    board = Board(display, size)
+    entry = word_entry(board, display, is_adjacent)
 
-    shake_dice_onto_board = ->
-      numbers = [0...num_squares]
-      dice = _.sortBy(numbers, Math.random)
-      for i in [0...num_squares] by 1
-        display.place_die(i, dice[i])
-    shake_dice_onto_board()
-  
 jQuery(document).ready ->
   boggle()
