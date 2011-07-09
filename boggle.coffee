@@ -20,7 +20,7 @@ boggle = ->
           
     do ->
       table = Util.build_table_from_2d_cell_array(table_data())
-      $("#board").append(table)
+      $("#boggle").append(table)
 
     self =
       square: (i) ->
@@ -39,6 +39,11 @@ boggle = ->
       lowlight: (pos) ->
         self.square(pos).css("background", "white")
 
+  word_entry = ->
+    field = $("<pre>")
+    $("#boggle").append(field)
+    field.html("ENTER WORD")
+    
   is_adjacent = (s1, s2) ->
     return false if s1 == s2
     r1 = Math.floor(s1 / size)
@@ -59,6 +64,8 @@ boggle = ->
     f = (i) ->
       is_adjacent(i, square)
     touch_all_squares(f, b.highlight, b.lowlight)
+
+  entry = word_entry()
 
   shake_dice_onto_board = ->
     numbers = [0...num_squares]

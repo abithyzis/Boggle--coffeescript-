@@ -17,7 +17,7 @@
     }
   };
   boggle = function() {
-    var b, board, is_adjacent, num_squares, shake_dice_onto_board, size, touch_all_squares;
+    var b, board, entry, is_adjacent, num_squares, shake_dice_onto_board, size, touch_all_squares, word_entry;
     size = 4;
     num_squares = size * size;
     board = function() {
@@ -44,7 +44,7 @@
       (function() {
         var table;
         table = Util.build_table_from_2d_cell_array(table_data());
-        return $("#board").append(table);
+        return $("#boggle").append(table);
       })();
       return self = {
         square: function(i) {
@@ -73,6 +73,12 @@
         }
       };
     };
+    word_entry = function() {
+      var field;
+      field = $("<pre>");
+      $("#boggle").append(field);
+      return field.html("ENTER WORD");
+    };
     is_adjacent = function(s1, s2) {
       var c1, c2, r1, r2;
       if (s1 === s2) {
@@ -100,6 +106,7 @@
       };
       return touch_all_squares(f, b.highlight, b.lowlight);
     });
+    entry = word_entry();
     shake_dice_onto_board = function() {
       var dice, i, numbers, _i, _results, _results2;
       numbers = (function() {
