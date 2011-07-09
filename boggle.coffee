@@ -9,13 +9,18 @@ Util =
     table
   shuffle_array: (array) ->
     _.sortBy(array, Math.random)
+  random_char: (s) ->
+    i = Math.floor(Math.random() * s.length)
+    s.charAt(i)
   
-Board = (display, size) ->
+Board = (display, size, letter_dice) ->
   dice = []
   num_squares = size * size
   shake_dice_onto_board = ->
     numbers = [0...num_squares]
     dice = Util.shuffle_array(numbers)
+    dice = _.map dice, (die) ->
+      Util.random_char letter_dice[die]
     for die, i in dice
       display.place_die(i, die)
   shake_dice_onto_board()
@@ -60,9 +65,13 @@ Display = (size) ->
 
 Word_builder = (board) ->
   square_indexes = []
+  s = ''
   self =
     add: (i) ->
       square_indexes.push(i)
+      s += board.get_letter(i)
+    text: ->
+      s
     already_used: (i) ->
       i in square_indexes
     in_reach: (new_i) ->
@@ -98,14 +107,34 @@ Word_entry = (board, display) ->
       return
     word.add(i)
     color_all_squares()
-    field.append("_" + board.get_letter(i))
+    file.html(word.text())
+
+LetterDice =
+  [
+    "AAEEGN",
+    "ELRTTY",
+    "AOOTTW",
+    "ABBJOO",
+    "EHRTVW",
+    "CIMOTU",
+    "DISTTY",
+    "EIOSST",
+    "DELRVY",
+    "ACHOPS",
+    "HIMNQU",
+    "EEINSU",
+    "EEGHNW",
+    "AFFKPS",
+    "HLNNRZ",
+    "DEILRX",
+  ]
 
 boggle = ->
   size = 4
 
   do ->
     display = Display(size)
-    board = Board(display, size)
+    board = Board(display, size, LetterDice)
     entry = Word_entry(board, display)
 
 jQuery(document).ready ->

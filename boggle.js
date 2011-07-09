@@ -1,5 +1,5 @@
 (function() {
-  var Board, Display, Util, Word_builder, Word_entry, boggle;
+  var Board, Display, LetterDice, Util, Word_builder, Word_entry, boggle;
   var __indexOf = Array.prototype.indexOf || function(item) {
     for (var i = 0, l = this.length; i < l; i++) {
       if (this[i] === item) return i;
@@ -23,9 +23,14 @@
     },
     shuffle_array: function(array) {
       return _.sortBy(array, Math.random);
+    },
+    random_char: function(s) {
+      var i;
+      i = Math.floor(Math.random() * s.length);
+      return s.charAt(i);
     }
   };
-  Board = function(display, size) {
+  Board = function(display, size, letter_dice) {
     var dice, num_squares, self, shake_dice_onto_board;
     dice = [];
     num_squares = size * size;
@@ -37,6 +42,9 @@
         return _results;
       }).apply(this, arguments);
       dice = Util.shuffle_array(numbers);
+      dice = _.map(dice, function(die) {
+        return Util.random_char(letter_dice[die]);
+      });
       _results2 = [];
       for (i = 0, _len = dice.length; i < _len; i++) {
         die = dice[i];
@@ -121,11 +129,16 @@
     };
   };
   Word_builder = function(board) {
-    var self, square_indexes;
+    var s, self, square_indexes;
     square_indexes = [];
+    s = '';
     return self = {
       add: function(i) {
-        return square_indexes.push(i);
+        square_indexes.push(i);
+        return s += board.get_letter(i);
+      },
+      text: function() {
+        return s;
       },
       already_used: function(i) {
         return __indexOf.call(square_indexes, i) >= 0;
@@ -183,16 +196,17 @@
       }
       word.add(i);
       color_all_squares();
-      return field.append("_" + board.get_letter(i));
+      return field.html(word.text());
     });
   };
+  LetterDice = ["AAEEGN", "ELRTTY", "AOOTTW", "ABBJOO", "EHRTVW", "CIMOTU", "DISTTY", "EIOSST", "DELRVY", "ACHOPS", "HIMNQU", "EEINSU", "EEGHNW", "AFFKPS", "HLNNRZ", "DEILRX"];
   boggle = function() {
     var size;
     size = 4;
     return (function() {
       var board, display, entry;
       display = Display(size);
-      board = Board(display, size);
+      board = Board(display, size, LetterDice);
       return entry = Word_entry(board, display);
     })();
   };
