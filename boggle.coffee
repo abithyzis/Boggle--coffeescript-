@@ -7,13 +7,15 @@ Util =
         tr.append(td)
       table.append(tr)
     table
-
+  shuffle_array: (array) ->
+    _.sortBy(array, Math.random)
+  
 Board = (display, size) ->
   dice = []
   num_squares = size * size
   shake_dice_onto_board = ->
     numbers = [0...num_squares]
-    dice = _.sortBy(numbers, Math.random)
+    dice = Util.shuffle_array(numbers)
     for i in [0...num_squares] by 1
       display.place_die(i, dice[i])
   shake_dice_onto_board()

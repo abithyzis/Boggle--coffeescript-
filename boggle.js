@@ -20,6 +20,9 @@
         table.append(tr);
       }
       return table;
+    },
+    shuffle_array: function(array) {
+      return _.sortBy(array, Math.random);
     }
   };
   Board = function(display, size) {
@@ -33,7 +36,7 @@
         for (var _i = 0; 0 <= num_squares ? _i < num_squares : _i > num_squares; 0 <= num_squares ? _i += 1 : _i -= 1){ _results.push(_i); }
         return _results;
       }).apply(this, arguments);
-      dice = _.sortBy(numbers, Math.random);
+      dice = Util.shuffle_array(numbers);
       _results2 = [];
       for (i = 0; (0 <= num_squares ? i < num_squares : i > num_squares); i += 1) {
         _results2.push(display.place_die(i, dice[i]));
