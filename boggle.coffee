@@ -49,11 +49,15 @@ boggle = ->
           i in square_indexes
         in_reach: (new_i) ->
           return true if square_indexes.length == 0
-          i = square_indexes[square_indexes.length - 1]
-          is_adjacent(i, new_i) 
+          last_square = self.last_square_selected()
+          is_adjacent(last_square, new_i) 
         legal: (new_i) ->
           self.in_reach(new_i) && !self.already_used(new_i)
+        last_square_selected: () ->
+          return undefined if square_indexes.length == 0
+          square_indexes[square_indexes.length - 1]
         color: (i) ->
+          return "lightgreen" if i == self.last_square_selected()
           return "lightblue" if self.already_used(i)
           return "white" if self.in_reach(i)
           return "red"
@@ -63,6 +67,10 @@ boggle = ->
       $("#boggle").append(field)
       field
 
+    color_all_squares = ->
+      for_all_squares (i) ->
+        display.color(i, word.color(i))
+
     word = word_builder()
     field = field_builder()
     display.on_click_square (i, square) ->
@@ -70,8 +78,7 @@ boggle = ->
         alert "illegal square choice" 
         return
       word.add(i)
-      for_all_squares (i) ->
-        display.color(i, word.color(i))
+      color_all_squares()
       field.append("_" + square.html())
           
   is_adjacent = (s1, s2) ->

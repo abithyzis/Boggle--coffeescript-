@@ -79,7 +79,7 @@
     size = 4;
     num_squares = size * size;
     word_entry = function(display) {
-      var field, field_builder, word, word_builder;
+      var color_all_squares, field, field_builder, word, word_builder;
       word_builder = function() {
         var self, square_indexes;
         square_indexes = [];
@@ -91,17 +91,26 @@
             return __indexOf.call(square_indexes, i) >= 0;
           },
           in_reach: function(new_i) {
-            var i;
+            var last_square;
             if (square_indexes.length === 0) {
               return true;
             }
-            i = square_indexes[square_indexes.length - 1];
-            return is_adjacent(i, new_i);
+            last_square = self.last_square_selected();
+            return is_adjacent(last_square, new_i);
           },
           legal: function(new_i) {
             return self.in_reach(new_i) && !self.already_used(new_i);
           },
+          last_square_selected: function() {
+            if (square_indexes.length === 0) {
+              return;
+            }
+            return square_indexes[square_indexes.length - 1];
+          },
           color: function(i) {
+            if (i === self.last_square_selected()) {
+              return "lightgreen";
+            }
             if (self.already_used(i)) {
               return "lightblue";
             }
@@ -118,6 +127,11 @@
         $("#boggle").append(field);
         return field;
       };
+      color_all_squares = function() {
+        return for_all_squares(function(i) {
+          return display.color(i, word.color(i));
+        });
+      };
       word = word_builder();
       field = field_builder();
       return display.on_click_square(function(i, square) {
@@ -126,9 +140,7 @@
           return;
         }
         word.add(i);
-        for_all_squares(function(i) {
-          return display.color(i, word.color(i));
-        });
+        color_all_squares();
         return field.append("_" + square.html());
       });
     };
