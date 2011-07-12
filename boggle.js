@@ -199,7 +199,6 @@
   Word_builder = (function() {
     function Word_builder(board) {
       this.board = board;
-      this.text = __bind(this.text, this);;
       this.square_indexes = [];
     }
     Word_builder.prototype.add = function(i) {

@@ -106,7 +106,7 @@ class Word_builder
     @square_indexes.push(i)
   backspace: ->
     @square_indexes.pop()
-  text: =>
+  text: ->
     _.map(@square_indexes, (i) =>
       @board.get_letter(i)
     ).join('')
