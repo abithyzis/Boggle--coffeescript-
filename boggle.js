@@ -191,7 +191,6 @@
       },
       scratchpad: {
         add_word: function(s) {
-          console.log("added " + s);
           return scratchpad.append(s + "\n");
         }
       }

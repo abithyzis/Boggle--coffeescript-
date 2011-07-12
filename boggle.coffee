@@ -97,7 +97,6 @@ Display = (size) ->
           on_click: (f) -> save_button.click(f)
     scratchpad:
       add_word: (s) ->
-        console.log("added #{s}")
         scratchpad.append(s + "\n") 
         
 class Word_builder
