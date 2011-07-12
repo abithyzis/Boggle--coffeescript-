@@ -54,39 +54,43 @@
     };
     return DiceShaker;
   })();
-  Board = function(display, size, letter_dice) {
-    var dice, die, i, num_squares, self, _len;
-    num_squares = size * size;
-    dice = new DiceShaker().shake(num_squares, letter_dice);
-    for (i = 0, _len = dice.length; i < _len; i++) {
-      die = dice[i];
-      display.place_die(i, die);
-    }
-    return self = {
-      get_letter: function(i) {
-        return dice[i];
-      },
-      for_all_squares: function(f) {
-        var square, _results;
-        _results = [];
-        for (square = 0; (0 <= num_squares ? square < num_squares : square > num_squares); square += 1) {
-          _results.push(f(square));
-        }
-        return _results;
-      },
-      is_adjacent: function(s1, s2) {
-        var c1, c2, r1, r2;
-        if (s1 === s2) {
-          return false;
-        }
-        r1 = Math.floor(s1 / size);
-        c1 = s1 % size;
-        r2 = Math.floor(s2 / size);
-        c2 = s2 % size;
-        return (Math.abs(r1 - r2) <= 1) && (Math.abs(c1 - c2) <= 1);
+  Board = (function() {
+    function Board(display, size, letter_dice) {
+      var die, i, _len, _ref;
+      this.display = display;
+      this.size = size;
+      this.num_squares = this.size * this.size;
+      this.dice = new DiceShaker().shake(this.num_squares, letter_dice);
+      _ref = this.dice;
+      for (i = 0, _len = _ref.length; i < _len; i++) {
+        die = _ref[i];
+        display.place_die(i, die);
       }
+    }
+    Board.prototype.get_letter = function(i) {
+      return this.dice[i];
     };
-  };
+    Board.prototype.for_all_squares = function(f) {
+      var square, _ref, _results;
+      _results = [];
+      for (square = 0, _ref = this.num_squares; (0 <= _ref ? square < _ref : square > _ref); square += 1) {
+        _results.push(f(square));
+      }
+      return _results;
+    };
+    Board.prototype.is_adjacent = function(s1, s2) {
+      var c1, c2, r1, r2;
+      if (s1 === s2) {
+        return false;
+      }
+      r1 = Math.floor(s1 / this.size);
+      c1 = s1 % this.size;
+      r2 = Math.floor(s2 / this.size);
+      c2 = s2 % this.size;
+      return (Math.abs(r1 - r2) <= 1) && (Math.abs(c1 - c2) <= 1);
+    };
+    return Board;
+  })();
   Display = function(size) {
     var scratchpad, self, word_entry_span;
     (function() {
@@ -301,7 +305,7 @@
     return (function() {
       var board, display;
       display = Display(size);
-      board = Board(display, size, LetterDice);
+      board = new Board(display, size, LetterDice);
       return Word_entry(board, display);
     })();
   };

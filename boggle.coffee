@@ -23,23 +23,23 @@ class DiceShaker
       letter = 'QU' if letter == 'Q'
       letter
   
-Board = (display, size, letter_dice) ->
-  num_squares = size * size
-  dice = new DiceShaker().shake(num_squares, letter_dice)
-  for die, i in dice
-    display.place_die(i, die)
-  self =
-    get_letter: (i) -> dice[i]
-    for_all_squares: (f) ->
-      for square in [0...num_squares] by 1
-        f(square)
-    is_adjacent: (s1, s2) ->
-      return false if s1 == s2
-      r1 = Math.floor(s1 / size)
-      c1 = s1 % size
-      r2 = Math.floor(s2 / size)
-      c2 = s2 % size
-      return (Math.abs(r1-r2) <= 1) && (Math.abs(c1-c2) <= 1)
+class Board 
+  constructor: (@display, @size, letter_dice) ->
+    @num_squares = @size * @size
+    @dice = new DiceShaker().shake(@num_squares, letter_dice)
+    for die, i in @dice
+      display.place_die(i, die)
+  get_letter: (i) -> @dice[i]
+  for_all_squares: (f) ->
+    for square in [0...@num_squares] by 1
+      f(square)
+  is_adjacent: (s1, s2) ->
+    return false if s1 == s2
+    r1 = Math.floor(s1 / @size)
+    c1 = s1 % @size
+    r2 = Math.floor(s2 / @size)
+    c2 = s2 % @size
+    return (Math.abs(r1-r2) <= 1) && (Math.abs(c1-c2) <= 1)
 
 Display = (size) ->
   do ->
@@ -196,7 +196,7 @@ boggle = ->
 
   do ->
     display = Display(size)
-    board = Board(display, size, LetterDice)
+    board = new Board(display, size, LetterDice)
     Word_entry(board, display)
 
 jQuery(document).ready ->
