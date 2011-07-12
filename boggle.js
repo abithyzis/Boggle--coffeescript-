@@ -30,8 +30,9 @@
       return s.charAt(i);
     }
   };
-  DiceShaker = {
-    shake: function(num_squares, letter_dice) {
+  DiceShaker = (function() {
+    function DiceShaker() {}
+    DiceShaker.prototype.shake = function(num_squares, letter_dice) {
       var dice, numbers, _i, _results;
       if (num_squares !== letter_dice.length) {
         throw "unexpected number of dice";
@@ -50,12 +51,13 @@
         }
         return letter;
       });
-    }
-  };
+    };
+    return DiceShaker;
+  })();
   Board = function(display, size, letter_dice) {
     var dice, die, i, num_squares, self, _len;
     num_squares = size * size;
-    dice = DiceShaker.shake(num_squares, letter_dice);
+    dice = new DiceShaker().shake(num_squares, letter_dice);
     for (i = 0, _len = dice.length; i < _len; i++) {
       die = dice[i];
       display.place_die(i, die);

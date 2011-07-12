@@ -13,7 +13,7 @@ Util =
     i = Math.floor(Math.random() * s.length)
     s.charAt(i)
   
-DiceShaker =
+class DiceShaker
   shake: (num_squares, letter_dice) ->
     throw "unexpected number of dice" if num_squares != letter_dice.length
     numbers = [0...num_squares]
@@ -25,7 +25,7 @@ DiceShaker =
   
 Board = (display, size, letter_dice) ->
   num_squares = size * size
-  dice = DiceShaker.shake(num_squares, letter_dice)
+  dice = new DiceShaker().shake(num_squares, letter_dice)
   for die, i in dice
     display.place_die(i, die)
   self =
