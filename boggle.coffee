@@ -132,44 +132,46 @@ Word_builder = (board) ->
       board.for_all_squares (i) ->
         display.color(i, color(i))
         
-Word_entry = (board, display) ->
-  word = Word_builder(board)
-    
-  redraw = ->
-    word.redraw_board(display)
-    text = word.text()
-    field.set(text)
+class Word_entry
+  constructor: (@board, @display) ->
+    @word = Word_builder(board)
+
+    {@field, @back_button, @save_button} = @display.word_entry()
+    @word.redraw_board(@display)
+
+    @display.on_click_square (i) => @on_click_letter(i)
+    @back_button.on_click => @backspace()
+    @save_button.on_click => @save()
+      
+  redraw: ->
+    @word.redraw_board(@display)
+    text = @word.text()
+    @field.set(text)
     if text.length > 0
-     back_button.show()
-     save_button.show()
+      @back_button.show()
+      @save_button.show()
     else
-      back_button.hide()
-      save_button.hide()
+      @back_button.hide()
+      @save_button.hide()
   
-  on_click_letter = (i) ->
+  on_click_letter: (i) ->
     try
-      word.validate_new_letter(i)
+      @word.validate_new_letter(i)
     catch error
       alert error
       return
-    word.add(i)
-    redraw()
+    @word.add(i)
+    @redraw()
 
-  backspace = ->
-    word.backspace()
-    redraw()
+  backspace: ->
+    @word.backspace()
+    @redraw()
 
-  save = ->
-    display.scratchpad.add_word(word.text())
-    word = Word_builder(board)
-    redraw()
+  save: ->
+    @display.scratchpad.add_word(@word.text())
+    @word = Word_builder(@board)
+    @redraw()
 
-  {field, back_button, save_button} = display.word_entry()
-  word.redraw_board(display)
-
-  display.on_click_square on_click_letter
-  back_button.on_click backspace
-  save_button.on_click save
 
 LetterDice =
   [
@@ -197,7 +199,7 @@ boggle = ->
   do ->
     display = Display(size)
     board = new Board(display, size, LetterDice)
-    Word_entry(board, display)
+    new Word_entry(board, display)
 
 jQuery(document).ready ->
   boggle()

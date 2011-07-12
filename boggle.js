@@ -5,7 +5,7 @@
       if (this[i] === item) return i;
     }
     return -1;
-  };
+  }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   Util = {
     build_table_from_2d_cell_array: function(array_2d) {
       var row, table, td, tr, _i, _j, _len, _len2;
@@ -257,47 +257,58 @@
       }
     };
   };
-  Word_entry = function(board, display) {
-    var back_button, backspace, field, on_click_letter, redraw, save, save_button, word, _ref;
-    word = Word_builder(board);
-    redraw = function() {
+  Word_entry = (function() {
+    function Word_entry(board, display) {
+      var _ref;
+      this.board = board;
+      this.display = display;
+      this.word = Word_builder(board);
+      _ref = this.display.word_entry(), this.field = _ref.field, this.back_button = _ref.back_button, this.save_button = _ref.save_button;
+      this.word.redraw_board(this.display);
+      this.display.on_click_square(__bind(function(i) {
+        return this.on_click_letter(i);
+      }, this));
+      this.back_button.on_click(__bind(function() {
+        return this.backspace();
+      }, this));
+      this.save_button.on_click(__bind(function() {
+        return this.save();
+      }, this));
+    }
+    Word_entry.prototype.redraw = function() {
       var text;
-      word.redraw_board(display);
-      text = word.text();
-      field.set(text);
+      this.word.redraw_board(this.display);
+      text = this.word.text();
+      this.field.set(text);
       if (text.length > 0) {
-        back_button.show();
-        return save_button.show();
+        this.back_button.show();
+        return this.save_button.show();
       } else {
-        back_button.hide();
-        return save_button.hide();
+        this.back_button.hide();
+        return this.save_button.hide();
       }
     };
-    on_click_letter = function(i) {
+    Word_entry.prototype.on_click_letter = function(i) {
       try {
-        word.validate_new_letter(i);
+        this.word.validate_new_letter(i);
       } catch (error) {
         alert(error);
         return;
       }
-      word.add(i);
-      return redraw();
+      this.word.add(i);
+      return this.redraw();
     };
-    backspace = function() {
-      word.backspace();
-      return redraw();
+    Word_entry.prototype.backspace = function() {
+      this.word.backspace();
+      return this.redraw();
     };
-    save = function() {
-      display.scratchpad.add_word(word.text());
-      word = Word_builder(board);
-      return redraw();
+    Word_entry.prototype.save = function() {
+      this.display.scratchpad.add_word(this.word.text());
+      this.word = Word_builder(this.board);
+      return this.redraw();
     };
-    _ref = display.word_entry(), field = _ref.field, back_button = _ref.back_button, save_button = _ref.save_button;
-    word.redraw_board(display);
-    display.on_click_square(on_click_letter);
-    back_button.on_click(backspace);
-    return save_button.on_click(save);
-  };
+    return Word_entry;
+  })();
   LetterDice = ["AAEEGN", "ELRTTY", "AOOTTW", "ABBJOO", "EHRTVW", "CIMOTU", "DISTTY", "EIOSST", "DELRVY", "ACHOPS", "HIMNQU", "EEINSU", "EEGHNW", "AFFKPS", "HLNNRZ", "DEILRX"];
   boggle = function() {
     var size;
@@ -306,7 +317,7 @@
       var board, display;
       display = Display(size);
       board = new Board(display, size, LetterDice);
-      return Word_entry(board, display);
+      return new Word_entry(board, display);
     })();
   };
   jQuery(document).ready(function() {
