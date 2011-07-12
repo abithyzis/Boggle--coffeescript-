@@ -100,41 +100,41 @@ Display = (size) ->
         console.log("added #{s}")
         scratchpad.append(s + "\n") 
         
-Word_builder = (board) ->
-  square_indexes = []
-  self =
-    add: (i) ->
-      square_indexes.push(i)
-    backspace: ->
-      square_indexes.pop()
-    text: ->
-      _.map(square_indexes, (i) ->
-        board.get_letter(i)
-      ).join('')
-    already_used: (i) ->
-      i in square_indexes
-    in_reach: (new_i) ->
-      return true if square_indexes.length == 0
-      last_square = self.last_square_selected()
-      board.is_adjacent(last_square, new_i) 
-    validate_new_letter: (new_i) ->
-      throw "already used" if self.already_used(new_i)
-      throw "out of reach" if !self.in_reach(new_i)
-    last_square_selected: () ->
-      return undefined if square_indexes.length == 0
-      square_indexes[square_indexes.length - 1]
-    redraw_board: (display) ->
-      color = (i) ->
-        return "lightgreen" if i == self.last_square_selected()
-        return "lightblue" if self.already_used(i)
-        return "white" if self.in_reach(i)
-        return "#DDD"
-      board.for_all_squares (i) ->
-        display.color(i, color(i))
+class Word_builder
+  constructor: (@board) ->
+    @square_indexes = []
+  add: (i) ->
+    @square_indexes.push(i)
+  backspace: ->
+    @square_indexes.pop()
+  text: =>
+    _.map(@square_indexes, (i) =>
+      @board.get_letter(i)
+    ).join('')
+  already_used: (i) ->
+    i in @square_indexes
+  in_reach: (new_i) ->
+    return true if @square_indexes.length == 0
+    last_square = @last_square_selected()
+    @board.is_adjacent(last_square, new_i) 
+  validate_new_letter: (new_i) ->
+    throw "already used" if @already_used(new_i)
+    throw "out of reach" if !@in_reach(new_i)
+  last_square_selected: () ->
+    return undefined if @square_indexes.length == 0
+    @square_indexes[@square_indexes.length - 1]
+  redraw_board: (display) ->
+    color = (i) =>
+      return "lightgreen" if i == @last_square_selected()
+      return "lightblue" if @already_used(i)
+      return "white" if @in_reach(i)
+      return "#DDD"
+    @board.for_all_squares (i) ->
+      display.color(i, color(i))
         
 class Word_entry
   constructor: (@board, @display) ->
-    @word = Word_builder(board)
+    @word = new Word_builder(board)
 
     {@field, @back_button, @save_button} = @display.word_entry()
     @word.redraw_board(@display)
@@ -169,7 +169,7 @@ class Word_entry
 
   save: ->
     @display.scratchpad.add_word(@word.text())
-    @word = Word_builder(@board)
+    @word = new Word_builder(@board)
     @redraw()
 
 

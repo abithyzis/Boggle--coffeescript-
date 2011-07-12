@@ -1,11 +1,11 @@
 (function() {
   var Board, DiceShaker, Display, LetterDice, Util, Word_builder, Word_entry, boggle;
-  var __indexOf = Array.prototype.indexOf || function(item) {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __indexOf = Array.prototype.indexOf || function(item) {
     for (var i = 0, l = this.length; i < l; i++) {
       if (this[i] === item) return i;
     }
     return -1;
-  }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  };
   Util = {
     build_table_from_2d_cell_array: function(array_2d) {
       var row, table, td, tr, _i, _j, _len, _len2;
@@ -197,72 +197,74 @@
       }
     };
   };
-  Word_builder = function(board) {
-    var self, square_indexes;
-    square_indexes = [];
-    return self = {
-      add: function(i) {
-        return square_indexes.push(i);
-      },
-      backspace: function() {
-        return square_indexes.pop();
-      },
-      text: function() {
-        return _.map(square_indexes, function(i) {
-          return board.get_letter(i);
-        }).join('');
-      },
-      already_used: function(i) {
-        return __indexOf.call(square_indexes, i) >= 0;
-      },
-      in_reach: function(new_i) {
-        var last_square;
-        if (square_indexes.length === 0) {
-          return true;
-        }
-        last_square = self.last_square_selected();
-        return board.is_adjacent(last_square, new_i);
-      },
-      validate_new_letter: function(new_i) {
-        if (self.already_used(new_i)) {
-          throw "already used";
-        }
-        if (!self.in_reach(new_i)) {
-          throw "out of reach";
-        }
-      },
-      last_square_selected: function() {
-        if (square_indexes.length === 0) {
-          return;
-        }
-        return square_indexes[square_indexes.length - 1];
-      },
-      redraw_board: function(display) {
-        var color;
-        color = function(i) {
-          if (i === self.last_square_selected()) {
-            return "lightgreen";
-          }
-          if (self.already_used(i)) {
-            return "lightblue";
-          }
-          if (self.in_reach(i)) {
-            return "white";
-          }
-          return "#DDD";
-        };
-        return board.for_all_squares(function(i) {
-          return display.color(i, color(i));
-        });
+  Word_builder = (function() {
+    function Word_builder(board) {
+      this.board = board;
+      this.text = __bind(this.text, this);;
+      this.square_indexes = [];
+    }
+    Word_builder.prototype.add = function(i) {
+      return this.square_indexes.push(i);
+    };
+    Word_builder.prototype.backspace = function() {
+      return this.square_indexes.pop();
+    };
+    Word_builder.prototype.text = function() {
+      return _.map(this.square_indexes, __bind(function(i) {
+        return this.board.get_letter(i);
+      }, this)).join('');
+    };
+    Word_builder.prototype.already_used = function(i) {
+      return __indexOf.call(this.square_indexes, i) >= 0;
+    };
+    Word_builder.prototype.in_reach = function(new_i) {
+      var last_square;
+      if (this.square_indexes.length === 0) {
+        return true;
+      }
+      last_square = this.last_square_selected();
+      return this.board.is_adjacent(last_square, new_i);
+    };
+    Word_builder.prototype.validate_new_letter = function(new_i) {
+      if (this.already_used(new_i)) {
+        throw "already used";
+      }
+      if (!this.in_reach(new_i)) {
+        throw "out of reach";
       }
     };
-  };
+    Word_builder.prototype.last_square_selected = function() {
+      if (this.square_indexes.length === 0) {
+        return;
+      }
+      return this.square_indexes[this.square_indexes.length - 1];
+    };
+    Word_builder.prototype.redraw_board = function(display) {
+      var color;
+      color = __bind(function(i) {
+        if (i === this.last_square_selected()) {
+          return "lightgreen";
+        }
+        if (this.already_used(i)) {
+          return "lightblue";
+        }
+        if (this.in_reach(i)) {
+          return "white";
+        }
+        return "#DDD";
+      }, this);
+      return this.board.for_all_squares(function(i) {
+        return display.color(i, color(i));
+      });
+    };
+    return Word_builder;
+  })();
   Word_entry = (function() {
     function Word_entry(board, display) {
       var _ref;
       this.board = board;
       this.display = display;
-      this.word = Word_builder(board);
+      this.word = new Word_builder(board);
       _ref = this.display.word_entry(), this.field = _ref.field, this.back_button = _ref.back_button, this.save_button = _ref.save_button;
       this.word.redraw_board(this.display);
       this.display.on_click_square(__bind(function(i) {
@@ -304,7 +306,7 @@
     };
     Word_entry.prototype.save = function() {
       this.display.scratchpad.add_word(this.word.text());
-      this.word = Word_builder(this.board);
+      this.word = new Word_builder(this.board);
       return this.redraw();
     };
     return Word_entry;
