@@ -42,6 +42,7 @@ class Board
     return (Math.abs(r1-r2) <= 1) && (Math.abs(c1-c2) <= 1)
 
 Display = (size) ->
+  $("#boggle").append("<p>Click on letters to make words.</p>")
   do ->
     table_data = ->
       _.map [0...size], (row) ->

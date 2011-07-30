@@ -93,6 +93,7 @@
   })();
   Display = function(size) {
     var scratchpad, self, word_entry_span;
+    $("#boggle").append("<p>Click on letters to make words.</p>");
     (function() {
       var table, table_data;
       table_data = function() {
